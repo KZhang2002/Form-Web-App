@@ -2,6 +2,9 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Be sure to install node.js and yarn for this
+installing npm also cant hurt but probably not required
+
 ## Available Scripts
 
 In the project directory, you can run:
