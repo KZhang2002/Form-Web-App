@@ -23,8 +23,8 @@ function App() {
   return (
     <div>
       {/* when testing, just put your component here and comment out the other components*/}
-      <Example/>
-      {/*<Home/>*/}
+      {/*<Example/>*/}
+      <Home/>
     </div>
   );
 }
