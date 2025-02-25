@@ -11,13 +11,10 @@ import Example from './ExampleFile.tsx';
 // You can also choose optimize layout, round values, and round colors <- optional
 // You don't have to pick the optional options but if you are unsure what to use i recommend it
 
-
 // Also look into figma's auto layout and integrate that into your designs. It'll help the page in the long run.
 // https://help.figma.com/hc/en-us/articles/5731482952599-Add-auto-layout-to-a-design
 
-// Look at Example in ExampleFile.tsx for details on general structure for you code
-// You can also look at Home but thats just a straight copy and paste from figma
-// so ur classnames shouldnt be that long
+// Look at Example in ExampleFile.tsx for details on general structure for your code
 
 function App() {
   return (
@@ -30,3 +27,4 @@ function App() {
 }
 
 export default App;
+
