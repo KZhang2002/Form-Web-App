@@ -22,7 +22,8 @@ import DocumentView from './DocumentView';
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<DocumentView/>}/>
+      <Route path="/" element={<Login/>}/>
+      <Route path="/doc" element={<DocumentView/>}/>
       <Route path="/home" element={<Home/>}/>
     </Routes>
   );

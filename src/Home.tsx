@@ -4,7 +4,7 @@ import {NavDrawer} from "./components/NavDrawer";
 import '@material/web/list/list.js';
 import '@material/web/list/list-item.js';
 import { LoginInfo } from "./Login";
-import { useLocation } from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 
 export const SearchBar = () => {
   return (
@@ -69,8 +69,10 @@ export const ListItem = (props: listItemProps) => {
   else if (index % 2 == 1) color = "bg-slate-200"
   else color = "bg-slate-100"
 
+  const navigate = useNavigate();
+
   return (
-    <md-list-item className={`w-[1421px] items-center ${color}`}>
+    <md-list-item onClick={() => navigate("/doc")} className={`w-[1421px] items-center ${color} cursor-pointer`}>
       <div slot="headline" className="justify-start gap-9 flex">
         <div
           className="w-[103px] text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
