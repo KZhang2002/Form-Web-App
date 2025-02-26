@@ -119,12 +119,13 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
         <div data-layer="state-layer"
           className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
           <div data-layer="Label"
-            className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">User List
+            className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight cursor-pointer"
+            onClick={() => navigate("/userList", { state: { loginInfo } })}>User List
           </div>
         </div>
       </div>
-      <div data-layer="Drafts"
-        className="Drafts self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden">
+      <div data-layer="Delete"
+        className="Delete self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
         <div data-layer="state-layer"
           className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
           <div data-layer="Label"
