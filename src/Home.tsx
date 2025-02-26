@@ -70,9 +70,10 @@ export const ListItem = (props: listItemProps) => {
   else color = "bg-slate-100"
 
   const navigate = useNavigate();
+  const func = isHeader ? () => {} : () => navigate("/doc"); //todo rename
 
   return (
-    <md-list-item onClick={() => navigate("/doc")} className={`w-[1421px] items-center ${color} cursor-pointer`}>
+    <md-list-item onClick={func} className={`w-[1421px] items-center ${color} ${isHeader ? "" : "cursor-pointer"}`}>
       <div slot="headline" className="justify-start gap-9 flex">
         <div
           className="w-[103px] text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
