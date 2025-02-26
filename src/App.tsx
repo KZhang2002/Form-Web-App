@@ -1,7 +1,10 @@
 import React from 'react';
+import { Routes, Route } from "react-router-dom"
 import './App.css';
 import Home from './Home.tsx';
 import Example from './ExampleFile.tsx';
+import Login from './Login.tsx'
+import DocumentView from './DocumentView';
 
 // I'll implement a system for navigating between pages later, just put any links as blank using "#" for now.
 // Figma has a plugin called FigmaToCode that allows you to select elements and get code for it
@@ -18,11 +21,10 @@ import Example from './ExampleFile.tsx';
 
 function App() {
   return (
-    <div>
-      {/* when testing, just put your component here and comment out the other components*/}
-      {/*<Example/>*/}
-      <Home/>
-    </div>
+    <Routes>
+      <Route path="/" element={<Login/>}/>
+      <Route path="/home" element={<Home/>}/>
+    </Routes>
   );
 }
 
