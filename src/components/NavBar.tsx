@@ -2,8 +2,12 @@ import React from "react";
 // import { ReactComponent as Icon } from './icon.svg';
 import Logo from "./Icons";
 
+type NavBarProps = {
+  username: string;
+  showAccount: boolean;
+}
 
-export const NavBar = () => {
+export const NavBar: React.FC<NavBarProps> = ({ username, showAccount }) => {
   return (
     <div data-layer="Top Bar"
          className="TopBar  self-stretch px-[29px] py-2.5 bg-[#0033a0] justify-start items-center gap-[81px] inline-flex">
@@ -17,12 +21,12 @@ export const NavBar = () => {
       </div>
       <div data-layer="Account Area"
            className="AccountArea grow shrink basis-0 h-[52px] justify-end items-center flex">
-        <div data-layer="Login Button"
-             className="LoginButton w-[191px] h-[52px] px-11 py-[7px] bg-[#c70f2e] rounded-lg justify-center items-center gap-2.5 flex">
+        {showAccount && <div data-layer="Login Button"
+             className="LoginButton flex h-[52px] px-11 py-[7px] bg-[#c70f2e] rounded-lg justify-center items-center gap-2.5 flex">
           <div data-layer="Log In"
-               className="LogIn text-center text-white text-[32px] font-medium font-['Inter']">Login
+               className="LogIn text-center text-white text-xl font-medium font-['Inter']">Logged in as: {username}
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   )

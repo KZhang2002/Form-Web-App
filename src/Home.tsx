@@ -1,6 +1,8 @@
 import React from "react";
 import NavBar from "./components/NavBar";
 import {NavDrawer} from "./components/NavDrawer";
+import { LoginInfo } from "./Login";
+import { useLocation } from "react-router-dom";
 
 export const SearchBar = () => {
   return (
@@ -46,10 +48,14 @@ export const SearchBar = () => {
 }
 
 export const Home = () => {
+
+  const location = useLocation();
+  const loginInfo: LoginInfo = location.state || {};
+
   return (
     <div data-layer="Default Layout"
          className="DefaultLayout w-full h-full bg-white flex-col justify-start items-start inline-flex overflow-hidden">
-      <NavBar/>
+      <NavBar username={loginInfo.username} showAccount={true}/>
       <div data-layer="Content" className="Content h-[995px] justify-start items-center gap-2.5 inline-flex">
         <NavDrawer/>
         <div data-layer="MainContent"

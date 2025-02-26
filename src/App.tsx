@@ -1,4 +1,5 @@
 import React from 'react';
+import { Routes, Route } from "react-router-dom"
 import './App.css';
 import Home from './Home.tsx';
 import Example from './ExampleFile.tsx';
@@ -20,11 +21,10 @@ import DocumentView from './DocumentView';
 
 function App() {
   return (
-    <div>
-      {/* when testing, just put your component here and comment out the other components*/}
-      {/*<Example/>*/}
-      <Home/>
-    </div>
+    <Routes>
+      <Route path="/" element={<Login/>}/>
+      <Route path="/home" element={<Home/>}/>
+    </Routes>
   );
 }
 
