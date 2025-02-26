@@ -83,6 +83,17 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
             </div>
           </div>
         </div>
+        <div data-layer="Template Creation" onClick={() => navigate("/")}
+             className="AccountCreation self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
+          <div data-layer="state-layer"
+               className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
+            <PlusIcon/>
+            <div data-layer="Label"
+                 className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Create
+              Template
+            </div>
+          </div>
+        </div>
         <div data-layer="Form List" onClick={() => navigate("/")}
              className="FormList self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
           <div data-layer="state-layer"
@@ -103,7 +114,8 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
                className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
             <LogOutIcon/>
             <div data-layer="Label"
-                 className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Log Out
+                 className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Log
+              Out
             </div>
           </div>
         </div>
