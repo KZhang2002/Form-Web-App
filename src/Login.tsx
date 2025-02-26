@@ -33,10 +33,8 @@ export const Login = () => {
         <div className="bg-blue-500">
         </div>
         <div className="grid grid-rows-5">
-          <div className="bg-gray-500">
-          </div>
           <div className="row-span-3 flex flex-col">
-            <div className="text-center text-5xl font-sans m-5">
+            <div className="text-center text-5xl font-sans m-5 justify-center mt-auto">
               Log into SwiftForms
             </div>
             <div className="text-xl font-sans m-5">
@@ -47,13 +45,11 @@ export const Login = () => {
               Password
             </div>
             <input className="flex border-2 mx-5" type="text" name="password" value={loginInfo.password} onChange={handleInputChange} />
-            <div className="mt-auto flex justify-center">
+            <div className="m-5 flex">
               <button onClick={() => navigate("/home", { state: loginInfo })}
                 className="mb-5 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-fit">Log In</button>
             </div>
 
-          </div>
-          <div className="bg-gray-500">
           </div>
         </div>
         <div className="bg-blue-500">
