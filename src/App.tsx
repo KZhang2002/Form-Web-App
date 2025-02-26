@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import Home from './Home.tsx';
 import Example from './ExampleFile.tsx';
+import AdminHome from "./AdminHome";
 
 // I'll implement a system for navigating between pages later, just put any links as blank using "#" for now.
 // Figma has a plugin called FigmaToCode that allows you to select elements and get code for it
@@ -21,7 +22,8 @@ function App() {
     <div>
       {/* when testing, just put your component here and comment out the other components*/}
       {/*<Example/>*/}
-      <Home/>
+      {/*<Home/>*/}
+      <AdminHome/>
     </div>
   );
 }
