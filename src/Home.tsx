@@ -172,7 +172,7 @@ export const List = () => {
 export const Home = () => {
 
   const location = useLocation();
-  const loginInfo: LoginInfo = location.state || {};
+  const loginInfo: LoginInfo = location.state || {}; // todo add zustand to simplify passing down data
 
   return (
     <div data-layer="Default Layout"
@@ -183,6 +183,7 @@ export const Home = () => {
         <div data-layer="MainContent"
              className="MainContent flex flex-col items-start gap-[30px] w-[1614px] pt-[30px] pr-[34px] pb-0 pl-[30px] self-stretch">
           <SearchBar/>
+          <List/>
         </div>
       </div>
     </div>
