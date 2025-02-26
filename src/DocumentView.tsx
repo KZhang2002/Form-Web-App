@@ -3,13 +3,9 @@ import './App.css';
 import './Home'
 import NavBar from "./components/NavBar";
 import { NavDrawer } from "./components/NavDrawer";
+import { DocumentToolDrawer } from './components/DocumentToolDrawer';
 
 export const DocumentView = () => {
-  const thingamajig = (num: number) => {
-    // do stuff
-    return num;
-  }
-
   return (
     <div>
       <div className="DefaultLayout w-full h-full bg-white flex-col justify-start items-start inline-flex overflow-hidden">
@@ -22,10 +18,8 @@ export const DocumentView = () => {
             <p>Your document content goes here...</p>
           </div>
         </div>
+        <DocumentToolDrawer/>
       </div>
-
-
-
 
     </div>
 
