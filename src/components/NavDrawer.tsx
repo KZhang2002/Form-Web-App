@@ -1,12 +1,34 @@
-import React from "react";
+import React, {useState} from "react";
 import { useNavigate } from 'react-router-dom';
 import {RequestIcon, SentIcon, DraftIcon, FormIcon, AccountCreationIcon, UsersIcon, PlusIcon, LogOutIcon} from "./Icons";
+import UserFormModal from "./Modal";
+import FormModal from "./FormModal";
 
 interface NavDrawerProps {
   isAdmin?: boolean
 }
 
 export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+
+  const openUserModal = () => setIsUserModalOpen(true);
+  const closeUserModal = () => setIsUserModalOpen(false);
+
+  const handleUserFormSubmit = (data: any) => {
+    console.log("User Data Submitted:", data);
+    closeUserModal(); // Close user modal after submission
+  };
+
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+
+  const openFormModal = () => setIsFormModalOpen(true);
+  const closeFormModal = () => setIsFormModalOpen(false);
+
+  const handleFormSubmit = (data: any) => {
+    console.log("Form Data Submitted:", data);
+    closeFormModal(); // Close form modal after submission
+  };
+
 
   const navigate = useNavigate();
 
@@ -14,7 +36,8 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
     <div>
       <div data-layer="Standard Tools"
            className="NavigationDrawerDefault w-[306px] h-[995px] p-3 bg-[#f7f2fa] flex-col justify-start items-start inline-flex overflow-hidden ">
-        <div data-layer="Account Creation" onClick={() => navigate("/")}
+
+        <div data-layer="Account Creation" onClick={openFormModal}
              className="AccountCreation self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
           <div data-layer="state-layer"
                className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
@@ -25,6 +48,13 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
             </div>
           </div>
         </div>
+
+        <FormModal
+          isOpen={isFormModalOpen}
+          onClose={closeFormModal}
+          onSubmit={handleFormSubmit}
+        />
+
         <div data-layer="Inbox" onClick={() => navigate("/")}
              className="Inbox self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
           <div data-layer="state-layer"
@@ -61,7 +91,8 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
         <div data-layer="Divider" className="w-[397px] h-px px-4 flex-col justify-center items-start inline-flex">
           <div className="self-stretch h-[0px] border border-stone-300"></div>
         </div>
-        <div data-layer="Account Creation" onClick={() => navigate("/")}
+
+        <div data-layer="Account Creation" onClick={openUserModal}
              className="AccountCreation self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
           <div data-layer="state-layer"
                className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
@@ -72,6 +103,13 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
             </div>
           </div>
         </div>
+
+        <UserFormModal
+          isOpen={isUserModalOpen}
+          onClose={closeUserModal}
+          onSubmit={handleUserFormSubmit}
+        />
+
         <div data-layer="User List" onClick={() => navigate("/")}
              className="UserList self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
           <div data-layer="state-layer"
@@ -119,37 +157,6 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
             </div>
           </div>
         </div>
-
-        {/*<div data-layer="Create Forms"*/}
-        {/*     className="CreateForms self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden">*/}
-        {/*  <div data-layer="state-layer"*/}
-        {/*       className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">*/}
-        {/*    <AccountCreationIcon />*/}
-        {/*    <div data-layer="Label"*/}
-        {/*         className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-        {/*</div>*/}
-        {/*<div data-layer="Archived Forms"*/}
-        {/*     className="ArchivedForms self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden">*/}
-        {/*  <div data-layer="state-layer"*/}
-        {/*       className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">*/}
-        {/*    /!*<FormIcon /> *!/*/}
-        {/*    <div data-layer="Label"*/}
-        {/*         className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-        {/*</div>*/}
-        {/*<div data-layer="Trash"*/}
-        {/*     className="Trash self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden">*/}
-        {/*  <div data-layer="state-layer"*/}
-        {/*       className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">*/}
-        {/*    /!*<TrashIcon /> *!/*/}
-        {/*    <div data-layer="Label"*/}
-        {/*         className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">*/}
-        {/*    </div>*/}
-        {/*  </div>*/}
-        {/*</div>*/}
       </div>
     </div>
   )
