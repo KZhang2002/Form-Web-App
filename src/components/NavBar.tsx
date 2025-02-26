@@ -10,7 +10,7 @@ export const NavBar = () => {
       <div data-layer="Logo Group" className="LogoGroup justify-start items-center gap-[18px] flex">
         <Logo/>
         <div data-layer="Title" className="Title w-[503px] h-[58px] justify-start items-center gap-[21px] inline-flex">
-          <div data-layer="SwiftForms Admin Tools" className="SwiftformsAdminTools"><span
+          <div data-layer="SwiftForms" className="Swiftforms"><span
             className="text-white text-5xl font-bold font-['Inter'] whitespace-pre">SwiftForms   </span><span
             className="text-[#dfcbcb] text-4xl font-semibold font-['Inter']">Admin Tools</span></div>
         </div>

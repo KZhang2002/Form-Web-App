@@ -41,3 +41,4 @@ export const NavDrawer = () => {
     </div>
   )
 }
+export default NavDrawer;
