@@ -56,12 +56,19 @@ interface listItemProps {
   formName?: string;
   formType?: string; // todo replace with formalized formtype variable?
   arrivalDate?: Date;
+  index?: number;
 }
 
 export const ListItem = (props: listItemProps) => {
-  const { isHeader, level, author, signaturesGotten, signaturesRequired, formName, formType, arrivalDate} = props;
+  const { isHeader, level, author, signaturesGotten, signaturesRequired, formName, formType, arrivalDate, index } = props;
+  let color = "bg-blue-400";
+  console.log(index);
+  if (index < 0) color = "bg-slate-300"
+  else if (index % 2 == 1) color = "bg-slate-200"
+  else color = "bg-slate-100"
+
   return (
-    <md-list-item className="w-[1421px] items-center ">
+    <md-list-item className={`w-[1421px] items-center ${color}`}>
       <div slot="headline" className="justify-start gap-9 flex">
         <div
           className="w-[103px] text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
@@ -81,7 +88,7 @@ export const ListItem = (props: listItemProps) => {
         </div>
         <div
           className="w-[104px] text-right text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
-          {`${isHeader ? "formType" : formType}`}
+          {`${isHeader ? "Form Type" : formType}`}
         </div>
         <div
           className="w-[157px] text-right text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
@@ -94,7 +101,7 @@ export const ListItem = (props: listItemProps) => {
 
 interface ListItemProps {
   isHeader: boolean;
-  level?: string;
+  level?: number;
   author?: string;
   signaturesGotten?: number;
   signaturesRequired?: number;
@@ -105,11 +112,8 @@ interface ListItemProps {
 
 const listData: ListItemProps[] = [
   {
-    isHeader: true, // Header item
-  },
-  {
     isHeader: false, // Regular item
-    level: "Level 1",
+    level: 1,
     author: "John Doe",
     signaturesGotten: 3,
     signaturesRequired: 5,
@@ -119,7 +123,7 @@ const listData: ListItemProps[] = [
   },
   {
     isHeader: false, // Another regular item
-    level: "Level 2",
+    level: 0,
     author: "Jane Smith",
     signaturesGotten: 2,
     signaturesRequired: 3,
@@ -127,38 +131,57 @@ const listData: ListItemProps[] = [
     formType: "Type 2",
     arrivalDate: "2024-01-02",
   },
+  {
+    isHeader: false, // Another regular item
+    level: 4,
+    author: "Audrey Zou",
+    signaturesGotten: 42,
+    signaturesRequired: 98,
+    formName: "Proposition to Ban all Witches from Campus",
+    formType: "Proposition",
+    arrivalDate: "2024-01-02",
+  },
+  {
+    isHeader: false, // Another regular item
+    level: 4,
+    author: "Miriam Webster",
+    signaturesGotten: 123,
+    signaturesRequired: 456,
+    formName: "Petition to Ban Audrey Zou from Campus",
+    formType: "Petition",
+    arrivalDate: "2024-01-02",
+  },
   // More items can be added here
 ];
-
-
 
 export const List = () => {
   return (
     <div>
-      <md-list style={{maxWidth: "300px"}}>
+      <md-list style={{maxWidth: "1550px", backgroundColor: "#ffffff"}}>
+        <ListItem key={-1} isHeader={true} index={-1}/>
         {listData.map((item, index) => (
-          <ListItem key={index} {...item} />
+          <ListItem key={index} {...{...item, index}} />
         ))}
       </md-list>
     </div>
   )
 }
 
-    export const Home = () => {
-      return (
-      <div data-layer="Default Layout"
-      className="DefaultLayout w-full h-full bg-white flex-col justify-start items-start inline-flex overflow-hidden">
-      <NavBar/>
-      <div data-layer="Content" className="Content h-[995px] justify-start items-center gap-2.5 inline-flex">
-      <NavDrawer/>
-      <div data-layer="MainContent"
-      className="MainContent flex flex-col items-start gap-[30px] w-[1614px] pt-[30px] pr-[34px] pb-0 pl-[30px] self-stretch">
-      <SearchBar/>
-      <List/>
-      </div>
-      </div>
-      </div>
-      )
-    }
+export const Home = () => {
+  return (
+  <div data-layer="Default Layout"
+  className="DefaultLayout w-full h-full bg-white flex-col justify-start items-start inline-flex overflow-hidden">
+  <NavBar/>
+  <div data-layer="Content" className="Content h-[995px] justify-start items-center gap-2.5 inline-flex">
+  <NavDrawer/>
+  <div data-layer="MainContent"
+  className="MainContent flex flex-col items-start gap-[30px] w-[1614px] pt-[30px] pr-[34px] pb-0 pl-[30px] self-stretch">
+  <SearchBar/>
+  <List/>
+  </div>
+  </div>
+  </div>
+  )
+}
 
-      export default Home;
+export default Home;
