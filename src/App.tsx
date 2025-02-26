@@ -2,6 +2,8 @@ import React from 'react';
 import './App.css';
 import Home from './Home.tsx';
 import Example from './ExampleFile.tsx';
+import Login from './Login.tsx'
+import DocumentView from './DocumentView';
 
 // I'll implement a system for navigating between pages later, just put any links as blank using "#" for now.
 // Figma has a plugin called FigmaToCode that allows you to select elements and get code for it
