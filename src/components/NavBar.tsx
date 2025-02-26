@@ -8,7 +8,7 @@ type NavBarProps = {
   isAdmin?: boolean;
 }
 
-export const NavBar: React.FC<NavBarProps> = ({username, showAccount, isAdmin}) => {
+export const NavBar: React.FC<NavBarProps> = ({username, showAccount, isAdmin = true}) => {
   return (
     <div data-layer="Top Bar"
          className="TopBar  self-stretch px-[29px] py-2.5 bg-[#0033a0] justify-start items-center gap-[81px] inline-flex">

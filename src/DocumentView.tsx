@@ -24,9 +24,6 @@ export const DocumentView = () => {
         </div>
       </div>
 
-
-
-
     </div>
 
 
