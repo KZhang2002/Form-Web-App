@@ -8,6 +8,7 @@ interface ModalProps {
 }
 
 interface FormData {
+  title: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -16,6 +17,7 @@ interface FormData {
 
 export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [formData, setFormData] = useState<FormData>({
+    title: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -30,6 +32,7 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
 
   const clearValues = () => {
     setFormData({
+      title: "",
       firstName: "",
       lastName: "",
       email: "",
@@ -44,15 +47,17 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
     clearValues();
   };
 
+  const exit = () => {
+    onClose();
+    clearValues();
+  }
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50" >
       <div className="bg-white p-6 rounded-lg shadow-lg w-96 relative">
         {/* Close button in the top right */}
         <button
-          onClick={() => {
-            onClose()
-            clearValues()
-          }}
+          onClick={exit}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
         >
           <PlusIcon/>
@@ -61,6 +66,16 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
         <h2 className="text-xl font-bold mb-4 text-center">User Information</h2>
 
         <form onSubmit={handleSubmit} className="space-y-3">
+          <input
+            type="text"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Title"
+            className="w-full p-2 border rounded-md"
+            required
+          />
+
           <input
             type="text"
             name="firstName"
@@ -100,7 +115,7 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
             {/*<option value="User">User</option>*/}
             {/*<option value="Admin">Admin</option>*/}
             {/*<option value="Guest">Guest</option>*/}
-            <option value="" disabled selected className="text-gray-500">
+            <option value="" disabled selected>
               User Level
             </option>
             <option value="0">0</option>
@@ -110,12 +125,9 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
           </select>
 
           <div className="flex justify-end space-x-2">
-          <button
+            <button
               type="button"
-              onClick={() => {
-                onClose()
-                clearValues()
-              }}
+              onClick={exit}
               className="px-4 py-2 bg-gray-300 rounded-md"
             >
               Cancel
