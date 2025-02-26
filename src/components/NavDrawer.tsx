@@ -68,7 +68,7 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
             </div>
           </div>
         </div>
-        <div data-layer="Sent" onClick={() => navigate("/home")}
+        <div data-layer="Sent" onClick={() => navigate("/sent", { state: { filter: 'sent' }, replace: true })}
              className="Sent self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
           <div data-layer="state-layer"
                className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
@@ -110,7 +110,7 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
           onSubmit={handleUserFormSubmit}
         />
 
-        <div data-layer="User List" onClick={() => navigate("/home")}
+        <div data-layer="User List" onClick={() => navigate("/userList", { state: { filter: 'userList' }, replace: true })}
              className="UserList self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
           <div data-layer="state-layer"
                className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
@@ -132,7 +132,7 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
             </div>
           </div>
         </div>
-        <div data-layer="Form List" onClick={() => navigate("/home")}
+        <div data-layer="Form List" onClick={() => navigate("/formList", { state: { filter: 'formList' }, replace: true })}
              className="FormList self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
           <div data-layer="state-layer"
                className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">

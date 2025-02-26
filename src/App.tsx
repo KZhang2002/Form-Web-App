@@ -25,6 +25,9 @@ function App() {
       <Route path="/" element={<Login/>}/>
       <Route path="/doc" element={<DocumentView/>}/>
       <Route path="/home" element={<Home/>}/>
+      <Route path="/sent" element={<Home/>}/>
+      <Route path="/userList" element={<Home/>}/>
+      <Route path="/formList" element={<Home/>}/>
     </Routes>
   );
 }
