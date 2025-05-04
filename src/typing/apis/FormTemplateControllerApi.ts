@@ -17,15 +17,12 @@ import * as runtime from '../runtime';
 import type {
   CreateFormTemplateRequest,
   FormTemplate,
-  SearchFormRequest,
 } from '../models/index';
 import {
     CreateFormTemplateRequestFromJSON,
     CreateFormTemplateRequestToJSON,
     FormTemplateFromJSON,
     FormTemplateToJSON,
-    SearchFormRequestFromJSON,
-    SearchFormRequestToJSON,
 } from '../models/index';
 
 export interface CreateFormTemplateOperationRequest {
@@ -34,10 +31,6 @@ export interface CreateFormTemplateOperationRequest {
 
 export interface DeleteFormTemplateRequest {
     formTemplateIdentifier: string;
-}
-
-export interface GetAllFormTemplatesRequest {
-    searchFormRequest: SearchFormRequest;
 }
 
 export interface GetFormTemplateRequest {
@@ -124,26 +117,16 @@ export class FormTemplateControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getAllFormTemplatesRaw(requestParameters: GetAllFormTemplatesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<FormTemplate>>> {
-        if (requestParameters['searchFormRequest'] == null) {
-            throw new runtime.RequiredError(
-                'searchFormRequest',
-                'Required parameter "searchFormRequest" was null or undefined when calling getAllFormTemplates().'
-            );
-        }
-
+    async getAllFormTemplatesRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<FormTemplate>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
             path: `/form_template/all`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
-            body: SearchFormRequestToJSON(requestParameters['searchFormRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(FormTemplateFromJSON));
@@ -151,8 +134,8 @@ export class FormTemplateControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getAllFormTemplates(requestParameters: GetAllFormTemplatesRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<FormTemplate>> {
-        const response = await this.getAllFormTemplatesRaw(requestParameters, initOverrides);
+    async getAllFormTemplates(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<FormTemplate>> {
+        const response = await this.getAllFormTemplatesRaw(initOverrides);
         return await response.value();
     }
 

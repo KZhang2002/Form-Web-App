@@ -13,7 +13,6 @@ export * from './FormTemplate';
 export * from './FormTemplateContent';
 export * from './FormTemplateSignature';
 export * from './LoginCredential';
-export * from './SearchFormRequest';
 export * from './SignFormRequest';
 export * from './UpdateFormContentRequest';
 export * from './UserInfo';
