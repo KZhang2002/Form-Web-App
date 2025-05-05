@@ -163,7 +163,7 @@ export class UserControllerApi extends runtime.BaseAPI {
 
     /**
      */
-    async getUsersRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<object>> {
+    async getUsersRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<UserInfo>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
@@ -175,12 +175,12 @@ export class UserControllerApi extends runtime.BaseAPI {
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse<any>(response);
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(UserInfoFromJSON));
     }
 
     /**
      */
-    async getUsers(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<object> {
+    async getUsers(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<UserInfo>> {
         const response = await this.getUsersRaw(initOverrides);
         return await response.value();
     }

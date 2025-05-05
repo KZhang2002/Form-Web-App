@@ -15,10 +15,12 @@ function App() {
       <Route path="/reset_password" element={<ResetPassword/>}/>
       <Route path="/doc" element={<DocumentView/>}/>
       <Route path="/home" element={<Home/>}/>
-      <Route path="/sent" element={<Home/>}/>
-      <Route path="/userList" element={<Home/>}/>
-      <Route path="/formList" element={<Home/>}/>
-      {/*<Route path="/test-api-connection" element={<TestApiConnection />} />*/}
+      {/*<Route path="/sent" element={<Home/>}/>*/}
+      {/*<Route path="/userList" element={<Home/>}/>*/}
+      {/*<Route path="/formList" element={<Home/>}/>*/}
+      <Route path="/home/sent" element={<Home />} />
+      <Route path="/home/userList" element={<Home />} />
+      <Route path="/home/formList" element={<Home />} />
     </Routes>
   );
 }

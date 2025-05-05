@@ -12,7 +12,6 @@
     "@types/node": "^16.7.13",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
-    "axios": "^1.9.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "react": "^19.0.0",
@@ -22,7 +21,7 @@
     "typescript": "^5.7.3",
     "vite": "^6.1.1",
     "web-vitals": "^2.1.0",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.4"
   },
   "scripts": {
     "dev": "vite",

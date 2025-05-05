@@ -1,12 +1,12 @@
 import React, {ChangeEvent, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import axios from 'axios';
 import './App.css';
 import './Home'
 import NavBar from './components/NavBar';
 import loginImage1 from "./Images/LoginImage1.png"
 import loginImage2 from "./Images/LoginImage2.png"
 import { UserControllerApi } from './typing';
+import {useAuthStore} from "./stores/useAuthStore";
 
 export interface LoginInfo {
   username: string;
@@ -39,20 +39,27 @@ export const Login = () => {
     return errorText;
   }
 
+  const { setAuth } = useAuthStore();
+
   const handleLogin = async () => {
     if (handleBlur()) return;
 
     setLoading(true);
     try {
       const api = new UserControllerApi();
-      const user = await api.loginUser({ username: loginInfo.username, password: loginInfo.password });
+      const user = await api.loginUser({
+        username: loginInfo.username,
+        password: loginInfo.password,
+      });
 
-      if(!user.loginCredential?.setPassword) {
-        navigate("/reset_password", {state: loginInfo});
-      }
-      else {
+      // Store login info in Zustand
+      setAuth(user);
+
+      if (!user.loginCredential?.setPassword) {
+        navigate("/reset_password", { state: loginInfo });
+      } else {
         setLoading(false);
-        navigate("/home", {state: loginInfo});
+        navigate("/home");
       }
     } catch (error) {
       setLoading(false);

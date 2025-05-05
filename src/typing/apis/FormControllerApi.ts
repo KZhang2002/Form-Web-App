@@ -233,6 +233,30 @@ export class FormControllerApi extends runtime.BaseAPI {
 
     /**
      */
+    async getFormsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Form>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/form/allForms`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(FormFromJSON));
+    }
+
+    /**
+     */
+    async getForms(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Form>> {
+        const response = await this.getFormsRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
     async getFormsByAuthorRaw(requestParameters: GetFormsByAuthorRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Form>>> {
         if (requestParameters['username'] == null) {
             throw new runtime.RequiredError(
