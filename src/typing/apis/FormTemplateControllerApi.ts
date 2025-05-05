@@ -37,6 +37,10 @@ export interface GetFormTemplateRequest {
     formTemplateIdentifier: string;
 }
 
+export interface GetTemplateFromFormRequest {
+    formId: number;
+}
+
 /**
  * 
  */
@@ -171,6 +175,41 @@ export class FormTemplateControllerApi extends runtime.BaseAPI {
      */
     async getFormTemplate(requestParameters: GetFormTemplateRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FormTemplate> {
         const response = await this.getFormTemplateRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getTemplateFromFormRaw(requestParameters: GetTemplateFromFormRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<FormTemplate>> {
+        if (requestParameters['formId'] == null) {
+            throw new runtime.RequiredError(
+                'formId',
+                'Required parameter "formId" was null or undefined when calling getTemplateFromForm().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['formId'] != null) {
+            queryParameters['formId'] = requestParameters['formId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/form_template/form`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => FormTemplateFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getTemplateFromForm(requestParameters: GetTemplateFromFormRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<FormTemplate> {
+        const response = await this.getTemplateFromFormRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

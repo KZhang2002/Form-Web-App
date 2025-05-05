@@ -39,6 +39,10 @@ export interface ChangeUserPasswordOperationRequest {
     changeUserPasswordRequest: ChangeUserPasswordRequest;
 }
 
+export interface GetUserFromFormRequest {
+    formId: number;
+}
+
 export interface LoginAdminRequest {
     username: string;
     password: string;
@@ -119,6 +123,41 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async changeUserPassword(requestParameters: ChangeUserPasswordOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginCredential> {
         const response = await this.changeUserPasswordRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getUserFromFormRaw(requestParameters: GetUserFromFormRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserInfo>> {
+        if (requestParameters['formId'] == null) {
+            throw new runtime.RequiredError(
+                'formId',
+                'Required parameter "formId" was null or undefined when calling getUserFromForm().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['formId'] != null) {
+            queryParameters['formId'] = requestParameters['formId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/user/form`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserInfoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getUserFromForm(requestParameters: GetUserFromFormRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserInfo> {
+        const response = await this.getUserFromFormRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
