@@ -11,13 +11,13 @@ type ListItemProps = {
 const ListItem = (props: ListItemProps) => {
   const { isHeader, headers, data, index } = props;
 
-  // If there is no data, display the "No forms here" message
-  if (data.length === 0 && index >= 0) {
+  // If there is no data to show and it's not the header, display a message
+  if (!isHeader && (!data || data.length === 0)) {
     return (
       <md-list-item className="w-[1421px] items-center bg-slate-100">
-        <div className="justify-center gap-9 flex">
+        <div className="justify-center gap-9 flex w-full">
           <div className="w-full text-center text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
-            There are no forms here!
+            There are no forms for you here!
           </div>
         </div>
       </md-list-item>
@@ -26,24 +26,25 @@ const ListItem = (props: ListItemProps) => {
 
   let color;
   if (index < 0) color = "bg-slate-300";
-  else if (index % 2 == 1) color = "bg-slate-200";
+  else if (index % 2 === 1) color = "bg-slate-200";
   else color = "bg-slate-100";
 
   return (
     <md-list-item className={`w-[1421px] items-center ${color} ${isHeader ? "" : "cursor-pointer"}`}>
       <div slot="headline" className="justify-start gap-9 flex">
-        {headers.map((header, idx) => (
+        {(isHeader ? headers : data).map((text, idx) => (
           <div
             key={idx}
             className="text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide"
           >
-            {header}
+            {text}
           </div>
         ))}
       </div>
     </md-list-item>
   );
 };
+
 
 
 type ListProps = {
@@ -56,8 +57,11 @@ type ListProps = {
 export const List = ({ sectionHeaders, data, refreshData, filterType }: ListProps) => {
   console.log("List received this data: ", data);
 
+  // Convert object array to 2D array of values (row-wise)
+  const tableData: any[][] = data.map((item) => sectionHeaders.map((header) => item[header]));
+
   return (
-    <div>
+    <div className="flex flex-col">
       <button
         onClick={() => refreshData(filterType)}
         className="px-12 py-2 mb-5 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
@@ -66,9 +70,9 @@ export const List = ({ sectionHeaders, data, refreshData, filterType }: ListProp
       </button>
       <md-list style={{ maxWidth: "1550px", backgroundColor: "#ffffff" }}>
         <ListItem key={-1} isHeader={true} index={-1} headers={sectionHeaders} data={[]} />
-        {data.length ? (
-          data.map((item, index) => (
-            <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={Object.values(item)} />
+        {tableData.length ? (
+          tableData.map((row, index) => (
+            <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} />
           ))
         ) : (
           <ListItem key={0} isHeader={false} index={0} headers={sectionHeaders} data={[]} />
@@ -77,3 +81,4 @@ export const List = ({ sectionHeaders, data, refreshData, filterType }: ListProp
     </div>
   );
 };
+

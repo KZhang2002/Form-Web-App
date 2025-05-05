@@ -18,9 +18,7 @@ function App() {
       {/*<Route path="/sent" element={<Home/>}/>*/}
       {/*<Route path="/userList" element={<Home/>}/>*/}
       {/*<Route path="/formList" element={<Home/>}/>*/}
-      <Route path="/home/sent" element={<Home />} />
-      <Route path="/home/userList" element={<Home />} />
-      <Route path="/home/formList" element={<Home />} />
+      <Route path="/home/:section" element={<Home />} />
     </Routes>
   );
 }
