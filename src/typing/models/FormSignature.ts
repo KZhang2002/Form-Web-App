@@ -67,12 +67,6 @@ export interface FormSignature {
     denialReason?: string;
     /**
      * 
-     * @type {string}
-     * @memberof FormSignature
-     */
-    signature?: string;
-    /**
-     * 
      * @type {Date}
      * @memberof FormSignature
      */
@@ -118,7 +112,6 @@ export function FormSignatureFromJSONTyped(json: any, ignoreDiscriminator: boole
         'signed': json['signed'] == null ? undefined : json['signed'],
         'approved': json['approved'] == null ? undefined : json['approved'],
         'denialReason': json['denialReason'] == null ? undefined : json['denialReason'],
-        'signature': json['signature'] == null ? undefined : json['signature'],
         'date': json['date'] == null ? undefined : (new Date(json['date'])),
         'form': json['form'] == null ? undefined : FormFromJSON(json['form']),
         'formTemplateSignature': json['formTemplateSignature'] == null ? undefined : FormTemplateSignatureFromJSON(json['formTemplateSignature']),
@@ -141,7 +134,6 @@ export function FormSignatureToJSONTyped(value?: FormSignature | null, ignoreDis
         'signed': value['signed'],
         'approved': value['approved'],
         'denialReason': value['denialReason'],
-        'signature': value['signature'],
         'date': value['date'] == null ? undefined : ((value['date']).toISOString()),
         'form': FormToJSON(value['form']),
         'formTemplateSignature': FormTemplateSignatureToJSON(value['formTemplateSignature']),
