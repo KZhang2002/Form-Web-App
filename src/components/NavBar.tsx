@@ -11,7 +11,7 @@ type NavBarProps = {
 export const NavBar: React.FC<NavBarProps> = ({username, showAccount, isAdmin = true}) => {
   return (
     <div data-layer="Top Bar"
-         className="TopBar  self-stretch px-[29px] py-2.5 bg-[#0033a0] justify-start items-center gap-[81px] inline-flex">
+         className="TopBar self-stretch px-[29px] py-2.5 bg-[#0033a0] justify-start items-center gap-[81px] inline-flex">
       <div data-layer="Logo Group" className="LogoGroup justify-start items-center gap-[18px] flex">
         <Logo/>
         <div data-layer="Title" className="Title w-[503px] h-[58px] justify-start items-center gap-[21px] inline-flex">

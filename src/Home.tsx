@@ -1,10 +1,13 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import NavBar from "./components/NavBar";
 import {NavDrawer} from "./components/NavDrawer";
 import '@material/web/list/list.js';
 import '@material/web/list/list-item.js';
 import { LoginInfo } from "./Login";
 import {useLocation, useNavigate} from "react-router-dom";
+import {getData} from "./backend/apiClient";
+import {FormControllerApi, GetFormsBySigneeRequest} from "./typing";
+import {List} from "./components/List";
 
 export const SearchBar = () => {
   return (
@@ -49,133 +52,44 @@ export const SearchBar = () => {
   )
 }
 
-interface listItemProps {
-  isHeader: boolean; //todo could probably come up with a better solution than this
-  level?: number;
-  author?: string;
-  signaturesGotten?: number;
-  signaturesRequired?: number;
-  formName?: string;
-  formType?: string; // todo replace with formalized formtype variable?
-  arrivalDate?: Date;
-  index?: number;
-}
-
-export const ListItem = (props: listItemProps) => {
-  const { isHeader, level, author, signaturesGotten, signaturesRequired, formName, formType, arrivalDate, index } = props;
-  let color = "bg-blue-400";
-  console.log(index);
-  if (index < 0) color = "bg-slate-300"
-  else if (index % 2 == 1) color = "bg-slate-200"
-  else color = "bg-slate-100"
-
-  const navigate = useNavigate();
-  const func = isHeader ? () => {} : () => navigate("/doc"); //todo rename
-
-  return (
-    <md-list-item onClick={func} className={`w-[1421px] items-center ${color} ${isHeader ? "" : "cursor-pointer"}`}>
-      <div slot="headline" className="justify-start gap-9 flex">
-        <div
-          className="w-[103px] text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
-          {`${isHeader ? "Level" : level}`}
-        </div>
-        <div
-          className="w-[260px] text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
-          {`${isHeader ? "Author" : author}`}
-        </div>
-        <div
-          className="w-[134px] text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
-          {`${isHeader ? "Signatures" : `${signaturesGotten}/${signaturesRequired}`}`}
-        </div>
-        <div
-          className="w-[483px] text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
-          {`${isHeader ? "Form Name" : formName}`}
-        </div>
-        <div
-          className="w-[104px] text-right text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
-          {`${isHeader ? "Form Type" : formType}`}
-        </div>
-        <div
-          className="w-[157px] text-right text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
-          {`${isHeader ? "Date" : arrivalDate}`}
-        </div>
-      </div>
-    </md-list-item>
-  )
-}
-
-interface ListItemProps {
-  isHeader: boolean;
-  level?: number;
-  author?: string;
-  signaturesGotten?: number;
-  signaturesRequired?: number;
-  formName?: string;
-  formType?: string;
-  arrivalDate?: string;
-}
-
-const listData: ListItemProps[] = [
-  {
-    isHeader: false, // Regular item
-    level: 1,
-    author: "John Doe",
-    signaturesGotten: 3,
-    signaturesRequired: 5,
-    formName: "Form A",
-    formType: "Type 1",
-    arrivalDate: "2024-01-01",
-  },
-  {
-    isHeader: false, // Another regular item
-    level: 0,
-    author: "Jane Smith",
-    signaturesGotten: 2,
-    signaturesRequired: 3,
-    formName: "Form B",
-    formType: "Type 2",
-    arrivalDate: "2024-01-02",
-  },
-  {
-    isHeader: false, // Another regular item
-    level: 4,
-    author: "Audrey Zou",
-    signaturesGotten: 42,
-    signaturesRequired: 98,
-    formName: "Proposition to Ban all Witches from Campus",
-    formType: "Proposition",
-    arrivalDate: "2024-01-02",
-  },
-  {
-    isHeader: false, // Another regular item
-    level: 4,
-    author: "Miriam Webster",
-    signaturesGotten: 123,
-    signaturesRequired: 456,
-    formName: "Petition to Ban Audrey Zou from Campus",
-    formType: "Petition",
-    arrivalDate: "2024-01-02",
-  },
-  // More items can be added here
-];
-
-export const List = () => {
-  return (
-    <div>
-      <md-list style={{maxWidth: "1550px", backgroundColor: "#ffffff"}}>
-        <ListItem key={-1} isHeader={true} index={-1}/>
-        {listData.map((item, index) => (
-          <ListItem key={index} {...{...item, index}} />
-        ))}
-      </md-list>
-    </div>
-  )
-}
-
 export const Home = () => {
-
   const location = useLocation();
   const loginInfo: LoginInfo = location.state || {}; // todo add zustand to simplify passing down data
+  const [listData, setListData] = useState<any[]>([]);
+
+  const fetchFormData = async () => {
+    console.log("attempting fetch data");
+    try {
+      const api = new FormControllerApi();
+      const requestParams: GetFormsBySigneeRequest = { username: loginInfo.username }; // use real username
+      const forms = await api.getFormsBySignee(requestParams);
+
+      const processedData = forms.map((form: any, index: number) => {
+        const signaturesGotten = form.formSignatureSet?.filter((sig: any) => sig.signed).length || 0;
+        const signaturesRequired = form.formSignatureSet?.length || 0;
+        return {
+          isHeader: false,
+          level: form.level || 0,
+          author: form.userInfo?.username || "Unknown",
+          signaturesGotten,
+          signaturesRequired,
+          formName: form.formTemplate?.name || "Unnamed",
+          formType: form.formTemplate?.type || "Unknown",
+          arrivalDate: form.publishDate || "N/A",
+          index
+        };
+      });
+
+      setListData(processedData);
+      console.log(forms);
+    } catch (e) {
+      console.error("Failed to fetch forms by signee:", e);
+    }
+  };
+
+  useEffect(() => {
+    fetchFormData();
+  }, []);
 
   return (
     <div data-layer="Default Layout"
@@ -186,7 +100,7 @@ export const Home = () => {
         <div data-layer="MainContent"
              className="MainContent flex flex-col items-start gap-[30px] w-[1614px] pt-[30px] pr-[34px] pb-0 pl-[30px] self-stretch">
           <SearchBar/>
-          <List/>
+          <List data={listData} refreshData={fetchFormData} />
         </div>
       </div>
     </div>
