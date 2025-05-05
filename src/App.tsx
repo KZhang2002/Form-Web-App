@@ -6,11 +6,13 @@ import Example from './ExampleFile.tsx';
 import Login from './Login.tsx'
 import DocumentView from './DocumentView';
 import TestApiConnection from './TestApiConnection';
+import ResetPassword from './ResetPassword';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login/>}/>
+      <Route path="/reset_password" element={<ResetPassword/>}/>
       <Route path="/doc" element={<DocumentView/>}/>
       <Route path="/home" element={<Home/>}/>
       <Route path="/sent" element={<Home/>}/>

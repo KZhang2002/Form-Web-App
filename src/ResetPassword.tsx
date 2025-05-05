@@ -1,35 +1,36 @@
 import React, {ChangeEvent, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import './App.css';
 import './Home'
 import NavBar from './components/NavBar';
 import loginImage1 from "./Images/LoginImage1.png"
 import loginImage2 from "./Images/LoginImage2.png"
-import { UserControllerApi } from './typing';
+import { UserControllerApi } from './typing/apis/UserControllerApi';
 
 export interface LoginInfo {
   username: string;
   password: string;
 }
 
-export const Login = () => {
+export const ResetPassword = () => {
   const navigate = useNavigate();
 
-  const [loginInfo, setLoginInfo] = useState<LoginInfo>({username: "", password: ""});
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [newPassword, setNewPassword] = useState<string>();
+
+  const location = useLocation();
+  const loginInfo: LoginInfo = location.state || {};
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const {name, value} = event.target;
-    setLoginInfo((prev) => ({...prev, [name]: value}));
+    setNewPassword(value);
   }
 
   const handleBlur = (): string => {
     let errorText = "";
-    if (loginInfo.username == "") {
-      errorText = "Username can not be empty";
-    } else if (loginInfo.password == "") {
+    if (loginInfo.password == "") {
       errorText = "Password can not be empty";
     } else {
       errorText = "";
@@ -39,21 +40,16 @@ export const Login = () => {
     return errorText;
   }
 
-  const handleLogin = async () => {
+  const handleReset = async () => {
     if (handleBlur()) return;
 
     setLoading(true);
     try {
       const api = new UserControllerApi();
-      const user = await api.loginUser({ username: loginInfo.username, password: loginInfo.password });
+      api.changeUserPassword({ changeUserPasswordRequest: { username: loginInfo.username, password: newPassword }});
 
-      if(!user.loginCredential?.setPassword) {
-        navigate("/reset_password", {state: loginInfo});
-      }
-      else {
-        setLoading(false);
-        navigate("/home", {state: loginInfo});
-      }
+      setLoading(false);
+      navigate("/home", {state: loginInfo});
     } catch (error) {
       setLoading(false);
       if (error.response?.status === 401) {
@@ -77,25 +73,20 @@ export const Login = () => {
         <div className="grid grid-rows-5">
           <div className="row-span-3 flex flex-col">
             <div className="text-center text-5xl font-sans m-5 mt-30">
-              Log into SwiftForms
+              Reset Password
             </div>
             <div className="text-xl font-sans m-5">
-              Username
+              New Password
             </div>
-            <input className="flex border-2 mx-5" type="text" name="username" value={loginInfo.username}
-                   onChange={handleInputChange} onBlur={handleBlur}/>
-            <div className="text-xl font-sans m-5">
-              Password
-            </div>
-            <input className="flex border-2 mx-5" type="text" name="password" value={loginInfo.password}
+            <input className="flex border-2 mx-5" type="text" name="password" value={newPassword}
                    onChange={handleInputChange} onBlur={handleBlur}/>
             <div className="m-5 flex">
               <button
-                onClick={handleLogin}
+                onClick={handleReset}
                 disabled={loading}
                 className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-fit"
               >
-                {loading ? 'Logging In...' : 'Log In'}
+                {loading ? 'Logging In...' : 'Set Password'}
               </button>
             </div>
             {error && <p className="mx-5 text-red-500">{error}</p>}
@@ -111,4 +102,4 @@ export const Login = () => {
   )
 };
 
-export default Login;
+export default ResetPassword;
