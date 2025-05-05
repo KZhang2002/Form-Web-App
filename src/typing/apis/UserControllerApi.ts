@@ -43,6 +43,10 @@ export interface GetUserFromFormRequest {
     formId: number;
 }
 
+export interface GetUserFromSignatureRequest {
+    signatureId: number;
+}
+
 export interface LoginAdminRequest {
     username: string;
     password: string;
@@ -158,6 +162,41 @@ export class UserControllerApi extends runtime.BaseAPI {
      */
     async getUserFromForm(requestParameters: GetUserFromFormRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserInfo> {
         const response = await this.getUserFromFormRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getUserFromSignatureRaw(requestParameters: GetUserFromSignatureRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<UserInfo>> {
+        if (requestParameters['signatureId'] == null) {
+            throw new runtime.RequiredError(
+                'signatureId',
+                'Required parameter "signatureId" was null or undefined when calling getUserFromSignature().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['signatureId'] != null) {
+            queryParameters['signatureId'] = requestParameters['signatureId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/user/signature`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => UserInfoFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getUserFromSignature(requestParameters: GetUserFromSignatureRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<UserInfo> {
+        const response = await this.getUserFromSignatureRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

@@ -6,7 +6,7 @@ import { NavDrawer } from "./components/NavDrawer";
 import { RequestIcon, SentIcon, DraftIcon } from "./components/Icons";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LoginInfo } from './Login';
-import { Form, FormControllerApi } from './typing';
+import { Form, FormControllerApi, FormSignature, FormTemplate, FormTemplateControllerApi, UserControllerApi, UserInfo } from './typing';
 
 interface ModalProps {
   isOpen: boolean;
@@ -36,10 +36,12 @@ export interface ApprovalInfo {
 
 type DocToolProps = {
   loginInfo: LoginInfo;
+  refreshForm: (formId: number) => Promise<void>;
 }
 
-const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
+const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUserListOpen, setIsUserListOpen] = useState(false);
   const navigate = useNavigate();
 
   const [approvalInfo, setApprovalInfo] = useState<ApprovalInfo>({ approve: false, reason: "" });
@@ -48,14 +50,65 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
   const location = useLocation();
   const docInfo: any = location.state || {};
 
+  const [form, setForm] = useState<Form | null>(null);
+  const [formTemplate, setFormTemplate] = useState<FormTemplate | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [signatureUserInfos, setSignatureUserInfos] = useState<Array<UserInfo> | null>(null);
+
+  async function refreshLocalForm(formId: number): Promise<void> {
+    const updatedForm = await loadForm(formId);
+    setForm(updatedForm);
+  }
+
+  async function handleUserList(): Promise<void> {
+    if(form?.formId)
+      await refreshLocalForm(form?.formId);
+    setIsUserListOpen(true);
+  }
+
+  useEffect(() => {
+    const getForm = async () => {
+      try {
+        const loadedForm = await loadForm(parseInt(loginInfo.password));
+        setForm(loadedForm);
+        if (loadedForm.formId != null) {
+          const loadedTemplate = await loadTemplate(loadedForm.formId);
+          setFormTemplate(loadedTemplate);
+
+          const loadedUser = await loadUserInfo(loadedForm.formId);
+          setUserInfo(loadedUser);
+
+          const loadedSignatureUsers = await loadUserInfoFromSignatures(loadedForm);
+          setSignatureUserInfos(loadedSignatureUsers);
+        }
+      } catch (error) {
+        console.error("Failed to load form:", error);
+      }
+    };
+    getForm();
+  }, []);
+
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setApprovalInfo((prev) => ({ ...prev, [name]: value }));
   }
 
+  async function handleApproval(): Promise<void> {
+    const user = signatureUserInfos?.find(u => u.username === loginInfo.username);
+
+    const api: FormControllerApi = new FormControllerApi();
+
+    await api.signForm({ signFormRequest: { formId: form?.formId, username: loginInfo.username, approved: approvalInfo.approve, denialReason: approvalInfo.approve ? "" : approvalInfo.reason }})
+
+    if(form?.formId)
+      refreshForm(form.formId);
+
+    setIsModalOpen(false);
+  }
+
   const handleBlur = (): string => {
     let errorText = "";
-    if (approvalInfo.reason == "") {
+    if (approvalInfo.approve === false && approvalInfo.reason == "") {
       errorText = "Reason can not be empty";
     }
     else {
@@ -64,6 +117,14 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
 
     setError(errorText);
     return errorText;
+  }
+
+  const handleDelete = (): void => {
+    const api: FormControllerApi = new FormControllerApi();
+
+    api.deleteForm( { formId: form?.formId ? form?.formId : 0 })
+
+    navigate('/home');
   }
 
   return (
@@ -75,7 +136,12 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
           className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
           <div data-layer="Label"
             className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight cursor-pointer"
-            onClick={() => setIsModalOpen(true)}>Document Approval
+            onClick={() => {
+              if(form?.formSignatureSet?.find(u => u.userInfo?.username === loginInfo.username)?.approved == null){
+                console.log(form?.formSignatureSet?.find(u => u.userInfo?.username === loginInfo.username)?.approved);
+                setIsModalOpen(true)
+              }
+            }}>Document Approval
           </div>
           <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
             <h2 className="text-xl font-bold">Document Approval</h2>
@@ -85,7 +151,7 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
                 <fieldset>
                   <div>
                     <input type="radio" id="approve" value="approve" name="drone" className="m-3"
-                      onClick={() => setApprovalInfo((prev) => ({ ...prev, approve: true }))} />
+                      onClick={ () => setApprovalInfo((prev) => ({ ...prev, approve: true })) } />
                     <label htmlFor="approve">Approve</label>
                     <input type="radio" id="deny" value="deny" name="drone" className="m-3"
                       onClick={() => setApprovalInfo((prev) => ({ ...prev, approve: false }))} />
@@ -98,7 +164,7 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
             {error && <p className=" text-red-500">{error}</p>}
             <div className="flex justify-between">
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={ () => setIsModalOpen(false) }
                 className="mt-4 bg-red-500 text-white px-4 py-2 rounded cursor-pointer left-element"
               >
                 Close
@@ -106,7 +172,7 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
               <button
                 onClick={() => {
                   if (!handleBlur()) {
-                    setIsModalOpen(false)
+                    handleApproval();
                   }
                 }}
                 className="mt-4 bg-green-500 text-white px-4 py-2 rounded cursor-pointer right-justify right-element"
@@ -114,6 +180,45 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
                 Submit
               </button>
             </div>
+
+          </Modal>
+          <Modal isOpen={isUserListOpen} onClose={() => setIsUserListOpen(false)}>
+            <div className="flex flex-col">
+              <h2 className="text-xl font-bold">User List</h2>
+              <div className="flex justify-between items-center w-full mt-2">
+                <div className="mt-2">Name</div>
+                <div className="mt-2">Approval Status</div>
+                <div className="mt-2">Denial Reason</div>
+              </div>
+              <div className='mt-2'>
+                {signatureUserInfos?.map((item, index) => (
+                  <div key={index} className="mb-2">
+                    <div className="flex justify-between items-center w-full mt-2">
+                      <div>{item.lastName}, {item.firstName}</div>
+                      {form?.formSignatureSet && form.formSignatureSet[index].signed
+                        ? form?.formSignatureSet && form.formSignatureSet[index].approved ?
+                          <div>Approved</div>
+                          :
+                          <div>Denied</div>
+                        : <div>Not Yet Approved</div>}
+                      {form?.formSignatureSet && form.formSignatureSet[index].signed
+                        ? form?.formSignatureSet && form.formSignatureSet[index].approved ?
+                          <div>N/A</div>
+                          :
+                          <div>{form.formSignatureSet[index].denialReason}</div>
+                        : <div>N/A</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => setIsUserListOpen(false)}
+                className="mt-4 bg-red-500 text-white px-4 py-2 rounded cursor-pointer left-element"
+              >
+                Close
+              </button>
+            </div>
+
 
           </Modal>
         </div>
@@ -124,67 +229,114 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
           className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
           <div data-layer="Label"
             className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight cursor-pointer"
-            onClick={() => navigate("/userList", { state: { loginInfo } })}>User List
+            onClick={() => handleUserList()}>User List
           </div>
         </div>
       </div>
-      <div data-layer="Delete"
+      { userInfo?.username === loginInfo.username ? 
+        <div data-layer="Delete"
         className="Delete self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
         <div data-layer="state-layer"
           className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
           <div data-layer="Label"
             className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight"
-            onClick={() => navigate("/home", { state: { loginInfo } })}>Delete
+            onClick={() =>  handleDelete() }>Delete
           </div>
         </div>
       </div>
+      :
+       <div></div>}
+      
     </div>
   )
 }
 
-  // const loadDocument = async (formId: number) => {
-  //   try {
-  //     const api = new FormControllerApi();
-  //     const form = await api.getForm({ formId: formId });
+// const loadDocument = async (formId: number) => {
+//   try {
+//     const api = new FormControllerApi();
+//     const form = await api.getForm({ formId: formId });
 
-  //     form.
+//     form.
 
-  //     if(!user.loginCredential?.setPassword) {
-  //       navigate("/reset_password", {state: loginInfo});
-  //     }
-  //     else {
-  //       setLoading(false);
-  //       navigate("/home", {state: loginInfo});
-  //     }
-  //   } catch (error) {
-  //     setLoading(false);
-  //     if (error.response?.status === 401) {
-  //       setError("Invalid username or password");
-  //     } else {
-  //       setError("An error occurred. Please try again.");
-  //     }
-  //   }
-  // };
+//     if(!user.loginCredential?.setPassword) {
+//       navigate("/reset_password", {state: loginInfo});
+//     }
+//     else {
+//       setLoading(false);
+//       navigate("/home", {state: loginInfo});
+//     }
+//   } catch (error) {
+//     setLoading(false);
+//     if (error.response?.status === 401) {
+//       setError("Invalid username or password");
+//     } else {
+//       setError("An error occurred. Please try again.");
+//     }
+//   }
+// };
 
-  async function loadForm(): Promise<Form> {
-    const api = new FormControllerApi();
-    return api.getForm({ formId: 1 });
+async function loadForm(formId: number): Promise<Form> {
+  console.log("Loading Form");
+  const api = new FormControllerApi();
+  return api.getForm({ formId: formId });
+}
+
+async function loadTemplate(formId: number): Promise<FormTemplate> {
+  const api = new FormTemplateControllerApi();
+  return api.getTemplateFromForm({ formId: formId });
+}
+
+async function loadUserInfo(formId: number): Promise<UserInfo> {
+  const api = new UserControllerApi();
+  return api.getUserFromForm({ formId: formId });
+}
+
+async function loadUserInfoFromSignatures(form: Form): Promise<Array<UserInfo>> {
+  const api = new UserControllerApi();
+  const userInfos: Array<UserInfo> = new Array<UserInfo>();
+  let userInfo: UserInfo;
+
+  if (form.formSignatureSet != null) {
+    for (const signature of form.formSignatureSet) {
+      if (signature.id != null) {
+        userInfo = await api.getUserFromSignature({ signatureId: signature.id });
+        userInfos.push(userInfo);
+      }
+    }
   }
+  return userInfos;
 
+}
 
 export const DocumentView = () => {
   const location = useLocation();
   const loginInfo: LoginInfo = location.state || { username: "Placeholder", password: "Placeholder" }; // todo add zustand to simplify passing down data
 
   const [form, setForm] = useState<Form | null>(null);
+  const [formTemplate, setFormTemplate] = useState<FormTemplate | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [signatureUserInfos, setSignatureUserInfos] = useState<Array<UserInfo> | null>(null);
+
+  async function refreshForm(formId: number): Promise<void> {
+    const updatedForm = await loadForm(formId);
+    setForm(updatedForm);
+  }
 
   useEffect(() => {
     const getForm = async () => {
       try {
-        const loadedForm = await loadForm();
+        const loadedForm = await loadForm(parseInt(loginInfo.password));
         setForm(loadedForm);
-        console.log("Form");
-        console.log(loadedForm);
+        if (loadedForm.formId != null) {
+          const loadedTemplate = await loadTemplate(loadedForm.formId);
+          setFormTemplate(loadedTemplate);
+
+          const loadedUser = await loadUserInfo(loadedForm.formId);
+          setUserInfo(loadedUser);
+
+          const loadedSignatureUsers = await loadUserInfoFromSignatures(loadedForm);
+          setSignatureUserInfos(loadedSignatureUsers);
+        }
       } catch (error) {
         console.error("Failed to load form:", error);
       }
@@ -197,22 +349,77 @@ export const DocumentView = () => {
       <div className="DefaultLayout w-full h-full bg-white flex-col justify-start items-start inline-flex overflow-hidden">
         <NavBar username={loginInfo.username} showAccount={true} />
       </div>
-      <div data-layer="Content" className="Content h-[995px] justify-start items-center gap-2.5 flex">
-        <NavDrawer />
-        <div className="h-screen flex flex-1 justify-center items-center bg-gray-200 self-stretch">
-          <div className="bg-white w-[800px] h-[800px] p-8 shadow-lg rounded-lg">
-            <div className="relative w-full h-16">
-              <div className="absolute left-1/2 transform -translate-x-1/2">
-                <p className="text-center">SOUTHERN METHODIST UNIVERSITY</p>
+      {form && formTemplate && userInfo && signatureUserInfos ? (
+        <div data-layer="Content" className="Content h-[995px] justify-start items-center gap-2.5 flex">
+          <NavDrawer />
+          <div className="h-screen flex flex-1 justify-center items-center bg-gray-200 self-stretch">
+            <div className="bg-white w-[800px] h-[800px] p-8 shadow-lg rounded-lg">
+              <div className="flex flex-col">
+                <div className="relative w-full h-6">
+                  <div className="absolute left-1/2 transform -translate-x-1/2">SOUTHERN METHODIST UNIVERSITY</div>
+                  <div className="absolute right-0">{formTemplate?.formTemplateIdentifier}</div>
+                </div>
+                <div className="mt-2 text-center">{formTemplate?.formTitle}</div>
+                <div className="mt-2">{formTemplate?.formDescription}</div>
+                <div className="w-full h-1 bg-black mt-2"></div>
+                <div className="flex justify-between items-center w-full mt-2">
+                  <div>Level: {userInfo?.level}</div>
+                  <div>Firstname: {userInfo?.firstName}</div>
+                  <div>Lastname: {userInfo?.lastName}</div>
+                  <div>Title: {userInfo?.title}</div>
+                  <div>FormID: {form?.formId}</div>
+                </div>
+                <div className="w-full h-1 bg-black mt-2"></div>
+                <div className="mt-2">
+                  {form?.formContentSet?.map((item, index) => (
+                    <div key={index} className="mb-2">
+                      <span className="font-semibold">{item.formTemplateContent?.contentName}:</span> {item.contentData}
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between items-center w-full mt-2">
+                  <div>Signature of the applicant: {userInfo?.lastName}, {userInfo?.firstName}</div>
+                  <div>Date: {form?.publishDate?.toLocaleDateString()}</div>
+                </div>
+                <div className="w-full h-1 bg-black mt-2"></div>
+                <div className='mt-2 font-semibold'>Signatures:</div>
+                <div className="flex justify-between items-center w-full mt-2">
+                  <div>Level</div>
+                  <div>Firstname</div>
+                  <div>Lastname</div>
+                  <div>Signature</div>
+                  <div>Date</div>
+                </div>
+                <div className='mt-2'>
+                  {signatureUserInfos?.map((item, index) => (
+                    <div key={index} className="mb-2">
+                      <div className="flex justify-between items-center w-full mt-2">
+                        <div>{item.level}</div>
+                        <div>{item.firstName}</div>
+                        <div>{item.lastName}</div>
+                        {form?.formSignatureSet && form.formSignatureSet[index].signed
+                          ? <div>{item.lastName}, {item.firstName}</div>
+                          : <div>Not Yet Approved</div>}
+                        {form?.formSignatureSet && form.formSignatureSet[index].signed
+                          ? <div>{form.formSignatureSet[index].date?.toLocaleDateString()}</div>
+                          : <div>   </div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+
               </div>
-              <div className="absolute right-4">
-                <p>{form?.formTemplate?.formTemplateIdentifier}</p>
-              </div>
+
             </div>
           </div>
+          <DocumentToolDrawer loginInfo={loginInfo} refreshForm={refreshForm} />
         </div>
-        <DocumentToolDrawer loginInfo={loginInfo} />
-      </div>
+      ) : (
+        <div>Loading...</div>
+      )}
+
+
 
     </div>
 
