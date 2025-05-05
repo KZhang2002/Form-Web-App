@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import './App.css';
 import './Home'
 import NavBar from "./components/NavBar";
@@ -6,7 +6,7 @@ import { NavDrawer } from "./components/NavDrawer";
 import { RequestIcon, SentIcon, DraftIcon } from "./components/Icons";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LoginInfo } from './Login';
-import { FormControllerApi } from './typing';
+import { Form, FormControllerApi } from './typing';
 
 interface ModalProps {
   isOpen: boolean;
@@ -142,34 +142,55 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
   )
 }
 
-  const loadDocument = async (formId: number) => {
-    try {
-      const api = new FormControllerApi();
-      const form = await api.getForm({ formId: formId });
+  // const loadDocument = async (formId: number) => {
+  //   try {
+  //     const api = new FormControllerApi();
+  //     const form = await api.getForm({ formId: formId });
 
-      form.
+  //     form.
 
-      if(!user.loginCredential?.setPassword) {
-        navigate("/reset_password", {state: loginInfo});
-      }
-      else {
-        setLoading(false);
-        navigate("/home", {state: loginInfo});
-      }
-    } catch (error) {
-      setLoading(false);
-      if (error.response?.status === 401) {
-        setError("Invalid username or password");
-      } else {
-        setError("An error occurred. Please try again.");
-      }
-    }
-  };
+  //     if(!user.loginCredential?.setPassword) {
+  //       navigate("/reset_password", {state: loginInfo});
+  //     }
+  //     else {
+  //       setLoading(false);
+  //       navigate("/home", {state: loginInfo});
+  //     }
+  //   } catch (error) {
+  //     setLoading(false);
+  //     if (error.response?.status === 401) {
+  //       setError("Invalid username or password");
+  //     } else {
+  //       setError("An error occurred. Please try again.");
+  //     }
+  //   }
+  // };
+
+  async function loadForm(): Promise<Form> {
+    const api = new FormControllerApi();
+    return api.getForm({ formId: 1 });
+  }
 
 
 export const DocumentView = () => {
   const location = useLocation();
   const loginInfo: LoginInfo = location.state || { username: "Placeholder", password: "Placeholder" }; // todo add zustand to simplify passing down data
+
+  const [form, setForm] = useState<Form | null>(null);
+
+  useEffect(() => {
+    const getForm = async () => {
+      try {
+        const loadedForm = await loadForm();
+        setForm(loadedForm);
+        console.log("Form");
+        console.log(loadedForm);
+      } catch (error) {
+        console.error("Failed to load form:", error);
+      }
+    };
+    getForm();
+  }, []);
 
   return (
     <div>
@@ -179,8 +200,15 @@ export const DocumentView = () => {
       <div data-layer="Content" className="Content h-[995px] justify-start items-center gap-2.5 flex">
         <NavDrawer />
         <div className="h-screen flex flex-1 justify-center items-center bg-gray-200 self-stretch">
-          <div className="bg-white w-[500px] h-[500px] p-8 shadow-lg rounded-lg">
-            <p>Your document content goes here...</p>
+          <div className="bg-white w-[800px] h-[800px] p-8 shadow-lg rounded-lg">
+            <div className="relative w-full h-16">
+              <div className="absolute left-1/2 transform -translate-x-1/2">
+                <p className="text-center">SOUTHERN METHODIST UNIVERSITY</p>
+              </div>
+              <div className="absolute right-4">
+                <p>{form?.formTemplate?.formTemplateIdentifier}</p>
+              </div>
+            </div>
           </div>
         </div>
         <DocumentToolDrawer loginInfo={loginInfo} />
