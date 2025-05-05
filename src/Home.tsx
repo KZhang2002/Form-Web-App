@@ -68,6 +68,7 @@ export const Home = () => {
         const signaturesGotten = form.formSignatureSet?.filter((sig: any) => sig.signed).length || 0;
         const signaturesRequired = form.formSignatureSet?.length || 0;
         return {
+          currentUser: loginInfo.username,
           isHeader: false,
           level: form.level || 0,
           author: form.userInfo?.username || "Unknown",
@@ -75,6 +76,7 @@ export const Home = () => {
           signaturesRequired,
           formName: form.formTemplate?.name || "Unnamed",
           formType: form.formTemplate?.type || "Unknown",
+          formId: form.formId || 0,
           arrivalDate: form.publishDate || "N/A",
           index
         };

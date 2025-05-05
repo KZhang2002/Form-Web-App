@@ -49,6 +49,10 @@ export interface DeleteFormRequest {
     formId: number;
 }
 
+export interface GetFormRequest {
+    formId: number;
+}
+
 export interface GetFormsByAuthorRequest {
     username: string;
 }
@@ -189,6 +193,41 @@ export class FormControllerApi extends runtime.BaseAPI {
      */
     async deleteForm(requestParameters: DeleteFormRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<string> {
         const response = await this.deleteFormRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     */
+    async getFormRaw(requestParameters: GetFormRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Form>> {
+        if (requestParameters['formId'] == null) {
+            throw new runtime.RequiredError(
+                'formId',
+                'Required parameter "formId" was null or undefined when calling getForm().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['formId'] != null) {
+            queryParameters['formId'] = requestParameters['formId'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/form`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => FormFromJSON(jsonValue));
+    }
+
+    /**
+     */
+    async getForm(requestParameters: GetFormRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Form> {
+        const response = await this.getFormRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

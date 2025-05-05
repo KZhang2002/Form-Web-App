@@ -6,6 +6,7 @@ import { NavDrawer } from "./components/NavDrawer";
 import { RequestIcon, SentIcon, DraftIcon } from "./components/Icons";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LoginInfo } from './Login';
+import { FormControllerApi } from './typing';
 
 interface ModalProps {
   isOpen: boolean;
@@ -43,6 +44,9 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
 
   const [approvalInfo, setApprovalInfo] = useState<ApprovalInfo>({ approve: false, reason: "" });
   const [error, setError] = useState("");
+
+  const location = useLocation();
+  const docInfo: any = location.state || {};
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -138,6 +142,31 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo }) => {
   )
 }
 
+  const loadDocument = async (formId: number) => {
+    try {
+      const api = new FormControllerApi();
+      const form = await api.getForm({ formId: formId });
+
+      form.
+
+      if(!user.loginCredential?.setPassword) {
+        navigate("/reset_password", {state: loginInfo});
+      }
+      else {
+        setLoading(false);
+        navigate("/home", {state: loginInfo});
+      }
+    } catch (error) {
+      setLoading(false);
+      if (error.response?.status === 401) {
+        setError("Invalid username or password");
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+    }
+  };
+
+
 export const DocumentView = () => {
   const location = useLocation();
   const loginInfo: LoginInfo = location.state || { username: "Placeholder", password: "Placeholder" }; // todo add zustand to simplify passing down data
@@ -145,7 +174,7 @@ export const DocumentView = () => {
   return (
     <div>
       <div className="DefaultLayout w-full h-full bg-white flex-col justify-start items-start inline-flex overflow-hidden">
-        <NavBar username={"Placeholder"} showAccount={true} />
+        <NavBar username={loginInfo.username} showAccount={true} />
       </div>
       <div data-layer="Content" className="Content h-[995px] justify-start items-center gap-2.5 flex">
         <NavDrawer />

@@ -2,6 +2,7 @@ import {useNavigate} from "react-router-dom";
 import React from "react";
 
 interface listItemProps {
+  currentUser: string;
   isHeader: boolean; //todo could probably come up with a better solution than this
   level?: number;
   author?: string;
@@ -9,19 +10,20 @@ interface listItemProps {
   signaturesRequired?: number;
   formName?: string;
   formType?: string; // todo replace with formalized formtype variable?
+  formId?: number;
   arrivalDate?: Date;
   index?: number;
 }
 
 export const ListItem = (props: listItemProps) => {
-  const { isHeader, level, author, signaturesGotten, signaturesRequired, formName, formType, arrivalDate, index } = props;
+  const { currentUser, isHeader, level, author, signaturesGotten, signaturesRequired, formName, formType, formId, arrivalDate, index } = props;
   let color;
   if (index < 0) color = "bg-slate-300"
   else if (index % 2 == 1) color = "bg-slate-200"
   else color = "bg-slate-100"
 
   const navigate = useNavigate();
-  const func = isHeader ? () => {} : () => navigate("/doc"); //todo rename
+  const func = isHeader ? () => {} : () => navigate("/doc", { state: { username: currentUser, password: formId }}); //todo rename
 
   return (
     <md-list-item onClick={func} className={`w-[1421px] items-center ${color} ${isHeader ? "" : "cursor-pointer"}`}>
