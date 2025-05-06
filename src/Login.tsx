@@ -94,7 +94,7 @@ export const Login = () => {
             <div className="text-xl font-sans m-5">
               Password
             </div>
-            <input className="flex border-2 mx-5" type="text" name="password" value={loginInfo.password}
+            <input className="flex border-2 mx-5" type="password" name="password" value={loginInfo.password}
                    onChange={handleInputChange} onBlur={handleBlur}/>
             <div className="m-5 flex">
               <button
