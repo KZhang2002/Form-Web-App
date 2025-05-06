@@ -14,7 +14,6 @@ interface FormData {
   email: string;
   userLevel: string;
   title: string;
-  admin: boolean;
 }
 
 export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -24,26 +23,31 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
     email: "",
     userLevel: "", // todo jank do fixy
     title: "",
-    admin: false,
   });
+
+  const[admin, setAdmin] = useState<boolean | undefined>(false);
 
   async function createUser(): Promise<void> {
     const api: UserControllerApi = new UserControllerApi();
 
-    api.addUser({ createUserRequest: {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      level: parseInt(formData.userLevel),
-      title: formData.title,
-      admin: formData.admin,
-    }});
+    console.log("Creating User")
+    api.addUser({
+      createUserRequest: {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        level: parseInt(formData.userLevel),
+        title: formData.title,
+        admin: admin,
+      }
+    });
   }
 
   if (!isOpen) return null; // Hide modal if not open
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    console.log(formData);
   };
 
   const clearValues = () => {
@@ -53,7 +57,6 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
       email: "",
       userLevel: "",
       title: "",
-      admin: false
     })
   }
 
@@ -75,7 +78,7 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
           }}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
         >
-          <PlusIcon/>
+          <PlusIcon />
         </button>
 
         <h2 className="text-xl font-bold mb-4 text-center">User Information</h2>
@@ -130,7 +133,7 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
             {/*<option value="User">User</option>*/}
             {/*<option value="Admin">Admin</option>*/}
             {/*<option value="Guest">Guest</option>*/}
-            <option value="" disabled selected className="text-gray-500">
+            <option defaultValue="" disabled className="text-gray-500">
               User Level
             </option>
             <option value="0">0</option>
@@ -139,16 +142,18 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
             <option value="3">3</option>
           </select>
 
+          <div className="space-y-2">
+            <h3 className="font-semibold">Admin?</h3>
+          </div>
           <input
             type="checkbox"
-            name="admin"
-            checked={formData.admin}
-            onChange={handleChange}
-            className="w-full p-2 border rounded-md"
+            checked={admin}
+            onChange={(e) => setAdmin(e.target.checked)}
+            className="w-full p-2 border rounded-md form-checkbox"
           />
 
           <div className="flex justify-end space-x-2">
-          <button
+            <button
               type="button"
               onClick={() => {
                 onClose()
@@ -162,6 +167,7 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
             <button
               type="submit"
               className="px-4 py-2 bg-blue-500 text-white rounded-md"
+              onClick={createUser}
             >
               Submit
             </button>
