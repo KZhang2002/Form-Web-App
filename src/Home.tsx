@@ -32,6 +32,8 @@ export const Home = () => {
   const [sectionHeaders, setSectionHeaders] = useState<string[]>([]);
   const [processedListData, setProcessedListData] = useState<any[]>([]);
   const [listData, setListData] = useState<Form[]>([]);
+  const [query, setQuery] = useState("");
+
   const { section } = useParams();
   const userInfo = useAuthStore((state) => state.userInfo);
 
@@ -147,10 +149,27 @@ export const Home = () => {
     }
   };
 
+  const filteredRows = processedListData.filter(row =>
+    row.some(cell =>
+      cell.toString().toLowerCase().includes(query.toLowerCase())
+    )
+  );
+
   useEffect(() => {
     console.log("Switched to section", section)
     fetchFormData(section ?? "default");
   }, [section]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      onSearch(query.trim());
+    }
+  };
+
+  const onSearch = (q: string) => {
+    setQuery(q);
+  }
+
 
   return (
     <div data-layer="Default Layout"
@@ -160,8 +179,32 @@ export const Home = () => {
         <NavDrawer/>
         <div data-layer="MainContent"
              className="MainContent flex flex-col items-start gap-[30px] w-[1614px] pt-[30px] pr-[34px] pb-0 pl-[30px] self-stretch">
-          {/*<SearchBar/>*/}
-          <List data={processedListData} sectionHeaders={sectionHeaders} refreshData={fetchFormData} filterType={section ?? ""} isForms={section !== "userList"} />
+
+          {/* Search bar */}
+          <div
+            className="SearchBar w-[720px] h-14 bg-[#ece6f0] rounded-[28px] justify-start items-center gap-1 inline-flex overflow-hidden">
+            <div className="StateLayer grow shrink basis-0 self-stretch p-1 justify-start items-center gap-1 flex">
+              <div className="LeadingIcon">
+                {/* Menu icon */}
+              </div>
+              <div className="Content grow shrink basis-0 self-stretch justify-start items-center gap-2.5 flex">
+                <input
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Search"
+                  className="bg-transparent outline-none text-[#49454f] text-base font-normal font-['Roboto'] leading-normal tracking-wide w-full"
+                />
+              </div>
+              <div className="TrailingElements cursor-pointer" onClick={() => onSearch(query.trim())}>
+                {/* Search icon */}
+              </div>
+            </div>
+          </div>
+
+          <List data={filteredRows} sectionHeaders={sectionHeaders} refreshData={fetchFormData}
+                filterType={section ?? ""} isForms={section !== "userList"}/>
         </div>
       </div>
     </div>
