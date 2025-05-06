@@ -387,7 +387,7 @@ export const DocumentView = () => {
                     return (
                       <div key={index} className="mb-2 whitespace-pre-wrap">
                         <span
-                          className="font-semibold">{formTemplate?.formTemplateContentSet?.[index]?.contentName}:</span>
+                          className="font-semibold">{formTemplate?.formTemplateContentSet?.[index]?.contentName}: </span>
                         {item.contentData?.replaceAll('\\n', '\n')}
                       </div>
                     )
