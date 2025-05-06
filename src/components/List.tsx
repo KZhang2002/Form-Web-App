@@ -84,7 +84,7 @@ const ListItem = (props: ListItemProps) => {
             {text ?? "error"}
           </div>
         ))}
-        { userInfo?.admin && !isHeader && filterType === "userList" && <div className="text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
+        { userInfo?.admin && userInfo.username !== formId && !isHeader && filterType === "userList" && <div className="text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
           <div className={"cursor-pointer"} onClick={() => {handleDelete()}}>
             <PlusIcon/>
           </div>
