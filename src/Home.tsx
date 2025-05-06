@@ -171,7 +171,14 @@ export const Home = () => {
         })
 
         setFormIdListData(formIds);
-      } else {
+      } else if (section == "userList") {
+        const formIds = forms.map((form: any, ind: number) => {
+          return form?.username ?? "";
+        })
+
+        setFormIdListData(formIds);
+      }
+      else {
         const formIds = forms.map((form: any, ind: number) => {
           return form.formId ?? 0;
         })
