@@ -49,6 +49,12 @@ export interface CreateUserRequest {
      * @memberof CreateUserRequest
      */
     email?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateUserRequest
+     */
+    admin?: boolean;
 }
 
 /**
@@ -73,6 +79,7 @@ export function CreateUserRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'level': json['level'] == null ? undefined : json['level'],
         'title': json['title'] == null ? undefined : json['title'],
         'email': json['email'] == null ? undefined : json['email'],
+        'admin': json['admin'] == null ? undefined : json['admin'],
     };
 }
 
@@ -92,6 +99,7 @@ export function CreateUserRequestToJSONTyped(value?: CreateUserRequest | null, i
         'level': value['level'],
         'title': value['title'],
         'email': value['email'],
+        'admin': value['admin'],
     };
 }
 

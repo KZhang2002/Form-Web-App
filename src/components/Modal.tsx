@@ -14,6 +14,7 @@ interface FormData {
   email: string;
   userLevel: string;
   title: string;
+  admin: boolean;
 }
 
 export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -23,6 +24,7 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
     email: "",
     userLevel: "", // todo jank do fixy
     title: "",
+    admin: false,
   });
 
   async function createUser(): Promise<void> {
@@ -33,7 +35,8 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
       lastName: formData.lastName,
       email: formData.email,
       level: parseInt(formData.userLevel),
-      title: formData.title
+      title: formData.title,
+      admin: formData.admin,
     }});
   }
 
@@ -49,7 +52,8 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
       lastName: "",
       email: "",
       userLevel: "",
-      title: ""
+      title: "",
+      admin: false
     })
   }
 
@@ -134,6 +138,14 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
             <option value="2">2</option>
             <option value="3">3</option>
           </select>
+
+          <input
+            type="checkbox"
+            name="admin"
+            checked={formData.admin}
+            onChange={handleChange}
+            className="w-full p-2 border rounded-md"
+          />
 
           <div className="flex justify-end space-x-2">
           <button
