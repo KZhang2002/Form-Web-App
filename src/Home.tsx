@@ -5,7 +5,7 @@ import '@material/web/list/list.js';
 import '@material/web/list/list-item.js';
 import {
   Form,
-  FormControllerApi, FormSignature, FormTemplateControllerApi,
+  FormControllerApi, FormSignature, FormTemplateControllerApi, FormTemplateSignature,
   GetFormsByAuthorRequest,
   GetFormsBySigneeRequest, GetUserFromFormRequest,
   UserControllerApi
@@ -27,6 +27,8 @@ export const headerToKeyMap: Record<string, string> = {
   "Date": "publishDate",
   "Author Level": "level",
   "Form ID": "formId",
+  "Template Title": "formTitle",
+  "Template Identifier": "formTemplateIdentifier",
 };
 
 export const Home = () => {
@@ -55,6 +57,8 @@ export const Home = () => {
       // Determine section headers locally
       if (filterType === "userList") {
         headers = ["Username", "First Name", "Last Name", "Level", "Title"];
+      } else if (filterType === "templateList") {
+        headers = ["Template Title", "Template Identifier", "Signatures"];
       } else {
         headers = ["Author Level", "Author", "Signatures", "Form Name", "Form Type", "Form ID", "Date"];
       }
@@ -75,13 +79,18 @@ export const Home = () => {
           forms = await formApi.getForms();
           break;
 
+        case "templateList":
+          forms = await tempApi.getAllFormTemplates();
+          console.log("templates", forms)
+          break;
+
         default:
           const signeeParams: GetFormsBySigneeRequest = { username: userInfo?.loginCredential?.username ?? "" };
           forms = await formApi.getFormsBySignee(signeeParams);
           break;
       }
 
-      if (filterType !== "userList") {
+      if (filterType !== "userList" && filterType !== "templateList") {
         other = await Promise.all(
           forms.map(async (form) => {
             const user = await userApi.getUserFromForm({ formId: form.formId });
@@ -119,12 +128,18 @@ export const Home = () => {
               return temps[ind]?.[key] ?? "";
 
             case "Signatures":
-              const signatures: FormSignature[] = form?.[key];
-              const total = signatures.length.toString();
-              const approved = signatures.reduce((count, sig) => {
-                return sig.approved === true ? count + 1 : count;
-              }, 0).toString();
-              return `${approved}/${total}`;
+              if (filterType === "templateList") {
+                const signatures: FormTemplateSignature[] = form?.formTemplateSignatureSet;
+                const total = signatures.length.toString();
+                return total.toString();
+              } else {
+                const signatures: FormSignature[] = form?.[key];
+                const total = signatures.length.toString();
+                const approved = signatures.reduce((count, sig) => {
+                  return sig.approved === true ? count + 1 : count;
+                }, 0).toString();
+                return `${approved}/${total}`;
+              }
 
             case "Date":
               const date: Date = form?.[key];
@@ -140,6 +155,8 @@ export const Home = () => {
             case "Last Name":
             case "Title":
             case "Form ID":
+            case "Template Title":
+            case "Template Identifier":
             default:
               return form?.[key] ?? "";
           }
@@ -148,11 +165,21 @@ export const Home = () => {
 
       setProcessedListData(listRows);
 
-      const formIds = forms.map((form: any, ind: number) => {
-        return form.formId;
-      })
+      if (section == "templateList") {
+        const formIds = forms.map((form: any, ind: number) => {
+          return form.formTemplateIdentifier ?? "";
+        })
 
-      setFormIdListData(formIds);
+        setFormIdListData(formIds);
+      } else {
+        const formIds = forms.map((form: any, ind: number) => {
+          return form.formId ?? 0;
+        })
+
+        setFormIdListData(formIds);
+      }
+
+
 
     } catch (e) {
       console.error(`Failed to fetch forms for section ${filterType}:`, e);
@@ -180,7 +207,6 @@ export const Home = () => {
     setQuery(q);
   }
 
-
   return (
     <div data-layer="Default Layout"
          className="DefaultLayout w-full h-full bg-white flex-col justify-start items-start inline-flex overflow-hidden">
@@ -189,8 +215,6 @@ export const Home = () => {
         <NavDrawer/>
         <div data-layer="MainContent"
              className="MainContent flex flex-col items-start gap-[30px] w-[1614px] pt-[30px] pr-[34px] pb-0 pl-[30px] self-stretch">
-
-          {/* Search bar */}
           <div
             className="SearchBar w-[720px] h-14 bg-[#ece6f0] rounded-[28px] justify-start items-center gap-1 inline-flex overflow-hidden">
             <div className="StateLayer grow shrink basis-0 self-stretch py-1 px-5 justify-start items-center gap-1 flex">
@@ -227,7 +251,7 @@ export const Home = () => {
           </div>
 
           <List data={filteredRows} formIds={formIdListData} sectionHeaders={sectionHeaders} refreshData={fetchFormData}
-                filterType={section ?? ""} isForms={section !== "userList"}/>
+                filterType={section ?? ""}/>
         </div>
       </div>
     </div>

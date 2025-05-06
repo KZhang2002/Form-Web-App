@@ -7,6 +7,7 @@ import Login from './Login.tsx'
 import DocumentView from './DocumentView';
 import TestApiConnection from './TestApiConnection';
 import ResetPassword from './ResetPassword';
+import TemplateView from "./TemplateView";
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
       <Route path="/reset_password" element={<ResetPassword/>}/>
       <Route path="/doc" element={<DocumentView/>}/>
       <Route path="/doc/:formId" element={<DocumentView/>}/>
+      <Route path="/template" element={<TemplateView/>}/>
+      <Route path="/template/:formTemplateIdentifier" element={<TemplateView/>}/>
       <Route path="/home" element={<Home/>}/>
       {/*<Route path="/sent" element={<Home/>}/>*/}
       {/*<Route path="/userList" element={<Home/>}/>*/}

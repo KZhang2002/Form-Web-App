@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import { RequestIcon, SentIcon, DraftIcon, FormIcon, AccountCreationIcon, UsersIcon, PlusIcon, LogOutIcon } from "./Icons";
+import {
+  RequestIcon,
+  SentIcon,
+  DraftIcon,
+  FormIcon,
+  AccountCreationIcon,
+  UsersIcon,
+  PlusIcon,
+  LogOutIcon,
+  TemplateIcon
+} from "./Icons";
 import UserFormModal from "./Modal";
 import FormModal from "./FormModal";
 import { useAuthStore } from "../stores/useAuthStore";
@@ -94,78 +104,92 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({ isAdmin = true }) => {
 
         {/*ADMIN TOOLS*/}
         {userInfo?.admin && <div className="flex flex-col">
-          <div data-layer="Account Creation" onClick={openUserModal}
-            className="AccountCreation self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
-            <div data-layer="state-layer"
-              className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
-              <PlusIcon />
-              <div data-layer="Label"
-                className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Create
-                Account
-              </div>
-            </div>
-          </div>
 
-          <UserFormModal
-            isOpen={isUserModalOpen}
-            onClose={closeUserModal}
-            onSubmit={handleUserFormSubmit}
-          />
+					<div data-layer="Form List" onClick={() => navigate("/home/formList", {replace: true})}
+							 className="FormList self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
+						<div data-layer="state-layer"
+								 className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
+							<FormIcon/>
+							<div data-layer="Label"
+									 className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Form
+								List
+							</div>
+						</div>
+					</div>
 
-          <div data-layer="User List" onClick={() => navigate("/home/userList", { replace: true })}
-            className="UserList self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
-            <div data-layer="state-layer"
-              className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
-              <UsersIcon />
-              <div data-layer="Label"
-                className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">User
-                List
-              </div>
-            </div>
-          </div>
+					<div data-layer="Account Creation" onClick={openUserModal}
+							 className="AccountCreation self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
+						<div data-layer="state-layer"
+								 className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
+							<PlusIcon/>
+							<div data-layer="Label"
+									 className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Create
+								Account
+							</div>
+						</div>
+					</div>
 
-          <TemplateModal 
-          isOpen={isTemplateModalOpen}
-          onClose={closeTemplateModal}
-          onSubmit={handleUserFormSubmit}>
-          </TemplateModal>
+					<UserFormModal
+						isOpen={isUserModalOpen}
+						onClose={closeUserModal}
+						onSubmit={handleUserFormSubmit}
+					/>
 
-          <div data-layer="Template Creation" onClick={openTemplateModal}
-            className="AccountCreation self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
-            <div data-layer="state-layer"
-              className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
-              <PlusIcon />
-              <div data-layer="Label"
-                className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Create
-                Template
-              </div>
-            </div>
-          </div>
-          <div data-layer="Form List" onClick={() => navigate("/home/formList", { replace: true })}
-            className="FormList self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
-            <div data-layer="state-layer"
-              className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
-              <FormIcon />
-              <div data-layer="Label"
-                className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Form
-                List
-              </div>
-            </div>
-          </div>
-          <div data-layer="Divider" className="w-[397px] h-px px-4 flex-col justify-center items-start inline-flex">
-            <div className="self-stretch h-[0px] border border-stone-300"></div>
-          </div>
-        </div>}
+					<div data-layer="User List" onClick={() => navigate("/home/userList", {replace: true})}
+							 className="UserList self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
+						<div data-layer="state-layer"
+								 className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
+							<UsersIcon/>
+							<div data-layer="Label"
+									 className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">User
+								List
+							</div>
+						</div>
+					</div>
 
+					<TemplateModal
+						isOpen={isTemplateModalOpen}
+						onClose={closeTemplateModal}
+						onSubmit={handleUserFormSubmit}>
+					</TemplateModal>
+
+					<div data-layer="Template Creation" onClick={openTemplateModal}
+							 className="AccountCreation self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
+						<div data-layer="state-layer"
+								 className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
+							<PlusIcon/>
+							<div data-layer="Label"
+									 className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Create
+								Template
+							</div>
+						</div>
+					</div>
+
+					<div data-layer="Template List" onClick={() => navigate("/home/templateList", {replace: true})}
+							 className="FormList self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
+						<div data-layer="state-layer"
+								 className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
+							<TemplateIcon/>
+							<div data-layer="Label"
+									 className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Template List
+							</div>
+						</div>
+					</div>
+
+					<div data-layer="Divider" className="w-[397px] h-px px-4 flex-col justify-center items-start inline-flex">
+						<div className="self-stretch h-[0px] border border-stone-300"></div>
+					</div>
+				</div>
+        }
 
 
         <div data-layer="LogOut" onClick={() => navigate("/")}
-          className="LogOut self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
+             className="LogOut self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
           <div data-layer="state-layer"
-            className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
-            <LogOutIcon />
+               className="StateLayer grow shrink basis-0 self-stretch pl-4 pr-6 py-4 justify-start items-center gap-3 flex">
+            <LogOutIcon/>
             <div data-layer="Label"
-              className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Log
+                 className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Log
               Out
             </div>
           </div>

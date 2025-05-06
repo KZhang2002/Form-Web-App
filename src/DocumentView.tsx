@@ -345,7 +345,7 @@ export const DocumentView = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [signatureUserInfos, setSignatureUserInfos] = useState<Array<UserInfo> | null>(null);
 
-  const { formId } = useParams();
+  const { formId = 1 } = useParams();
 
   async function refreshForm(formId: number): Promise<void> {
     const updatedForm = await loadForm(formId);

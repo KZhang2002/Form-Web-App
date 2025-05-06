@@ -19,18 +19,21 @@ type ListItemProps = {
   index: number;
   headers: string[]; // Array of section headers
   data: string[]; // Array of corresponding data
-  isForm?: boolean;
-  formId?: number;
+  formId?: number | string;
+  filterType?: string;
 };
 
 const ListItem = (props: ListItemProps) => {
-  const { isHeader, headers, data, index, isForm = false, formId = -1 } = props;
+  const { isHeader, headers, data, index, filterType = "formList", formId = 1 } = props;
 
   const navigate = useNavigate();
 
+  const interactionDisabled = isHeader || filterType == "userList";
+
   const handleClick = (id: number) => {
-    if (isHeader || !isForm) return;
-    navigate(`/doc/${formId}`);
+    if (interactionDisabled) return;
+    if (filterType == "templateList") navigate(`/template/${formId}`);
+    else navigate(`/doc/${formId}`);
   };
 
   // If there is no data to show and it's not the header, display a message
@@ -52,7 +55,7 @@ const ListItem = (props: ListItemProps) => {
   else color = "bg-slate-100";
 
   return (
-    <md-list-item className={`w-[1421px] items-center ${color} ${isHeader || !isForm ? "" : "cursor-pointer"}`}
+    <md-list-item className={`w-[1421px] items-center ${color} ${interactionDisabled ? "" : "cursor-pointer"}`}
                   onClick={() => handleClick(1)}
     >
       <div slot="headline" className="justify-start gap-9 flex">
@@ -77,11 +80,12 @@ type ListProps = {
   formIds: any[]; // Array of data objects
   refreshData: (filterType: string) => Promise<void>;
   filterType: string;
-  isForms: boolean;
 };
 
-export const List = ({ sectionHeaders, data, formIds, refreshData, filterType, isForms }: ListProps) => {
+export const List = ({ sectionHeaders, data, formIds, refreshData, filterType }: ListProps) => {
+  console.log("List received this section: ", filterType);
   console.log("List received this data: ", data);
+  console.log("List received these formIds: ", formIds);
 
   return (
     <div className="flex flex-col">
@@ -96,7 +100,7 @@ export const List = ({ sectionHeaders, data, formIds, refreshData, filterType, i
           <ListItem key={-1} isHeader={true} index={-1} headers={sectionHeaders} data={[]} />
           {data.length ? (
             data.map((row, index) => (
-              <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} isForm={isForms} formId={formIds[index]} />
+              <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} filterType={filterType} formId={formIds[index]} />
             ))
           ) : (
             <ListItem key={0} isHeader={false} index={0} headers={sectionHeaders} data={[]} />
