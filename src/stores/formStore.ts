@@ -1,45 +1,67 @@
 import {create} from "zustand";
-import {Form, FormControllerApi, GetFormsByAuthorRequest, GetFormsBySigneeRequest, UserControllerApi} from "../typing";
+import {
+  Form,
+  FormControllerApi,
+  GetFormsByAuthorRequest,
+  GetFormsBySigneeRequest,
+  UserControllerApi,
+  UserInfo
+} from "../typing";
 import {headerToKeyMap} from "../Home";
 
 // Define your store type
-interface FormStore {
+interface FormState {
+  currentListData: (UserInfo | Form)[];
+  processedListData: (UserInfo | Form)[];
+  // userInfo: UserInfo;
   sectionHeaders: string[];
-  setSectionHeaders: (headers: string[]) => void;
-  listData: Form[];
-  setListData: (data: Form[]) => void;
-  processedListData: any[];
-  setProcessedListData: (data: any[]) => void;
-  fetchFormData: (filterType: string, userInfo: any) => void;
 }
 
-export const useFormStore = create<FormStore>((set) => ({
-  sectionHeaders: [],
-  listData: [],
-  processedListData: [],
-  setSectionHeaders: (headers: string[]) => set({ sectionHeaders: headers }),
-  setListData: (data: Form[]) => set({ listData: data }),
-  setProcessedListData: (data: any[]) => set({ processedListData: data }),
+export const headerToKeyMap: Record<string, string> = {
+  "Username": "username",
+  "First Name": "firstName",
+  "Last Name": "lastName",
+  "Level": "level",
+  "Title": "title",
+  "Author": "author",
+  "Signatures": "signatures",
+  "Form Name": "formName",
+  "Form Type": "formType",
+  "Date": "date"
+};
 
-  fetchFormData: async (filterType: string, userInfo: any) => {
+export const useFormStore = create<FormState>((set, get) => ({
+  currentListData: [],
+  // userInfo: null,
+  sectionHeaders: [],
+
+  setCurrentListData: (listData: (UserInfo | Form)[]) => {
+    set(() => ({
+      currentListData: listData,
+    }));
+  },
+
+  fetchFormData : async ({string: filterType, userInfo: user}) => {
     console.log(`Attempting fetch data for section: ${filterType ?? "default"}`);
 
     let forms = [];
+    let headers: string[] = [];
 
     try {
       const formApi = new FormControllerApi();
       const userApi = new UserControllerApi();
 
-      // Determine section headers based on filterType and set the state
       if (filterType === "userList") {
-        set({ sectionHeaders: ["Username", "First Name", "Last Name", "Level", "Title"] });
+        headers = ["Username", "First Name", "Last Name", "Level", "Title"];
       } else {
-        set({ sectionHeaders: ["Level", "Author", "Signatures", "Form Name", "Form Type", "Date"] });
+        headers = ["Level", "Author", "Signatures", "Form Name", "Form Type", "Date"];
       }
+
+      set({ sectionHeaders: headers });
 
       switch (filterType) {
         case "sent":
-          const sentParams: GetFormsByAuthorRequest = { username: userInfo?.loginCredential?.username ?? "" };
+          const sentParams: GetFormsByAuthorRequest = { username: user?.loginCredential?.username ?? "" };
           forms = await formApi.getFormsByAuthor(sentParams);
           break;
 
@@ -51,29 +73,22 @@ export const useFormStore = create<FormStore>((set) => ({
           forms = await formApi.getForms();
           break;
 
-        case "default":
         default:
-          if (!userInfo?.loginCredential?.username) {
-            console.warn("No username found; skipping fetch.");
-            return;
-          }
-
-          const signeeParams: GetFormsBySigneeRequest = { username: userInfo?.loginCredential?.username ?? "" };
+          const signeeParams: GetFormsBySigneeRequest = { username: user?.loginCredential?.username ?? "" };
           forms = await formApi.getFormsBySignee(signeeParams);
           break;
       }
 
-      console.log("Fetched forms:", forms);
-      set({ listData: forms });
+      if (forms) set({ currentListData: forms });
 
       const listRows = forms.map((form: any) =>
-        set.state.sectionHeaders.map((header) => {
+        headers.map(header => {
           const key = headerToKeyMap[header];
-          return form?.[key] ?? ""; // Fallback to empty string if key doesn't exist
+          return form?.[key] ?? "";
         })
       );
 
-      set({ processedListData: listRows });
+      set ({processedListData: listRows});
     } catch (e) {
       console.error(`Failed to fetch forms for section ${filterType}:`, e);
     }

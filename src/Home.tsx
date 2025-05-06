@@ -5,9 +5,9 @@ import '@material/web/list/list.js';
 import '@material/web/list/list-item.js';
 import {
   Form,
-  FormControllerApi,
+  FormControllerApi, FormSignature, FormTemplateControllerApi,
   GetFormsByAuthorRequest,
-  GetFormsBySigneeRequest,
+  GetFormsBySigneeRequest, GetUserFromFormRequest,
   UserControllerApi
 } from "./typing";
 import {List} from "./components/List";
@@ -20,11 +20,12 @@ export const headerToKeyMap: Record<string, string> = {
   "Last Name": "lastName",
   "Level": "level",
   "Title": "title",
-  "Author": "author",
-  "Signatures": "signatures",
-  "Form Name": "formName",
-  "Form Type": "formType",
-  "Date": "date"
+  "Author": "username",
+  "Signatures": "formSignatureSet",
+  "Form Name": "formTitle",
+  "Form Type": "formTemplateIdentifier",
+  "Date": "publishDate",
+  "Author Level": "level",
 };
 
 export const Home = () => {
@@ -38,17 +39,20 @@ export const Home = () => {
     console.log(`Attempting fetch data for section: ${filterType ?? "default"}`);
 
     let forms = [];
+    let other = [];
+    let temps = []; // templates
     let headers: string[] = [];
 
     try {
       const formApi = new FormControllerApi();
       const userApi = new UserControllerApi();
+      const tempApi = new FormTemplateControllerApi();
 
       // Determine section headers locally
       if (filterType === "userList") {
         headers = ["Username", "First Name", "Last Name", "Level", "Title"];
       } else {
-        headers = ["Level", "Author", "Signatures", "Form Name", "Form Type", "Date"];
+        headers = ["Author Level", "Author", "Signatures", "Form Name", "Form Type", "Date"];
       }
 
       setSectionHeaders(headers);
@@ -73,13 +77,67 @@ export const Home = () => {
           break;
       }
 
+      if (filterType !== "userList") {
+        other = await Promise.all(
+          forms.map(async (form) => {
+            const user = await userApi.getUserFromForm({ formId: form.formId });
+            return user;
+          })
+        );
+
+        temps = await Promise.all(
+          forms.map(async (form) => {
+            const temp = await tempApi.getTemplateFromForm({ formId: form.formId });
+            return temp;
+          })
+        );
+      }
+
       console.log("Fetched forms:", forms);
+      console.log("Fetched other:", other);
       setListData(forms);
 
-      const listRows = forms.map((form: any) =>
+      const listRows = forms.map((form: any, ind: number) =>
         headers.map(header => {
           const key = headerToKeyMap[header];
-          return form?.[key] ?? "";
+          if (!key) {
+            console.warn(`No mapping found for header: ${header}`);
+            return "";
+          }
+
+          switch (header) {
+            case "Author":
+            case "Author Level":
+              return other[ind]?.[key] ?? "";
+
+            case "Form Name":
+            case "Form Type":
+              return temps[ind]?.[key] ?? "";
+
+            case "Signatures":
+              const signatures: FormSignature[] = form?.[key];
+              const total = signatures.length.toString();
+              const approved = signatures.reduce((count, sig) => {
+                return sig.approved === true ? count + 1 : count;
+              }, 0).toString();
+              return `${approved}/${total}`;
+
+            case "Date":
+              const date: Date = form?.[key];
+              return date.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              }).toString() ?? "";
+
+            case "Level":
+            case "Username":
+            case "First Name":
+            case "Last Name":
+            case "Title":
+            default:
+              return form?.[key] ?? "";
+          }
         })
       );
 

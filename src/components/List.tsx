@@ -1,6 +1,19 @@
 import {useNavigate} from "react-router-dom";
 import React from "react";
 
+export const headerToKeyMap: Record<string, string> = {
+  "Username": "username",
+  "First Name": "firstName",
+  "Last Name": "lastName",
+  "Level": "level",
+  "Title": "title",
+  "Author": "author",
+  "Signatures": "signatures",
+  "Form Name": "formName",
+  "Form Type": "formType",
+  "Date": "publishDate"
+};
+
 type ListItemProps = {
   isHeader: boolean;
   index: number;
@@ -37,7 +50,7 @@ const ListItem = (props: ListItemProps) => {
             key={idx}
             className="text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide"
           >
-            {text}
+            {text ?? "error"}
           </div>
         ))}
       </div>
@@ -57,9 +70,6 @@ type ListProps = {
 export const List = ({ sectionHeaders, data, refreshData, filterType }: ListProps) => {
   console.log("List received this data: ", data);
 
-  // Convert object array to 2D array of values (row-wise)
-  const tableData: any[][] = data.map((item) => sectionHeaders.map((header) => item[header]));
-
   return (
     <div className="flex flex-col">
       <button
@@ -68,16 +78,18 @@ export const List = ({ sectionHeaders, data, refreshData, filterType }: ListProp
       >
         Refresh
       </button>
-      <md-list style={{ maxWidth: "1550px", backgroundColor: "#ffffff" }}>
-        <ListItem key={-1} isHeader={true} index={-1} headers={sectionHeaders} data={[]} />
-        {tableData.length ? (
-          tableData.map((row, index) => (
-            <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} />
-          ))
-        ) : (
-          <ListItem key={0} isHeader={false} index={0} headers={sectionHeaders} data={[]} />
-        )}
-      </md-list>
+      <div className="max-h-[700px] overflow-y-auto">
+        <md-list style={{ maxWidth: "1550px", backgroundColor: "#ffffff" }}>
+          <ListItem key={-1} isHeader={true} index={-1} headers={sectionHeaders} data={[]} />
+          {data.length ? (
+            data.map((row, index) => (
+              <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} />
+            ))
+          ) : (
+            <ListItem key={0} isHeader={false} index={0} headers={sectionHeaders} data={[]} />
+          )}
+        </md-list>
+      </div>
     </div>
   );
 };

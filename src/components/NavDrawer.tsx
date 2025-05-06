@@ -33,12 +33,13 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
   };
 
 
+
   const navigate = useNavigate();
 
   return (
     <div>
       <div data-layer="Standard Tools"
-           className="NavigationDrawerDefault w-[306px] h-[995px] p-3 bg-[#f7f2fa] flex-col justify-start items-start inline-flex overflow-hidden ">
+           className="NavigationDrawerDefault w-[306px] h-[995px] p-3 bg-[#f7f2fa] flex-col self-stretch justify-start items-start inline-flex overflow-hidden ">
 
         <div data-layer="Account Creation" onClick={openFormModal}
              className="AccountCreation self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
@@ -67,7 +68,7 @@ export const NavDrawer: React.FC<NavDrawerProps> = ({isAdmin = true}) => {
                  className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">Requests
             </div>
             <div data-layer="Badge label text"
-                 className="BadgeLabelText text-right text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">123
+                 className="BadgeLabelText text-right text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight">
             </div>
           </div>
         </div>
