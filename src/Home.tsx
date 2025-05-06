@@ -26,6 +26,7 @@ export const headerToKeyMap: Record<string, string> = {
   "Form Type": "formTemplateIdentifier",
   "Date": "publishDate",
   "Author Level": "level",
+  "Form ID": "formId",
 };
 
 export const Home = () => {
@@ -54,7 +55,7 @@ export const Home = () => {
       if (filterType === "userList") {
         headers = ["Username", "First Name", "Last Name", "Level", "Title"];
       } else {
-        headers = ["Author Level", "Author", "Signatures", "Form Name", "Form Type", "Date"];
+        headers = ["Author Level", "Author", "Signatures", "Form Name", "Form Type", "Form ID", "Date"];
       }
 
       setSectionHeaders(headers);
@@ -137,6 +138,7 @@ export const Home = () => {
             case "First Name":
             case "Last Name":
             case "Title":
+            case "Form ID":
             default:
               return form?.[key] ?? "";
           }

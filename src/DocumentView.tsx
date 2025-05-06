@@ -154,21 +154,45 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ formId, refreshForm }) => 
                 <p>Approval Status</p>
                 <fieldset>
                   <div>
-                    <input type="radio" id="approve" value="approve" name="drone" className="m-3"
-                      onClick={ () => setApprovalInfo((prev) => ({ ...prev, approve: true })) } />
+                    <input
+                      type="radio"
+                      id="approve"
+                      value="approve"
+                      name="drone"
+                      className="m-3"
+                      onClick={() => setApprovalInfo((prev) => ({...prev, approve: true}))}
+                    />
                     <label htmlFor="approve">Approve</label>
-                    <input type="radio" id="deny" value="deny" name="drone" className="m-3"
-                      onClick={() => setApprovalInfo((prev) => ({ ...prev, approve: false }))} />
-                    <label htmlFor="approve">Deny</label>
+
+                    <input
+                      type="radio"
+                      id="deny"
+                      value="deny"
+                      name="drone"
+                      className="m-3"
+                      onClick={() => setApprovalInfo((prev) => ({...prev, approve: false}))}
+                    />
+                    <label htmlFor="deny">Deny</label>
                   </div>
                 </fieldset>
-                <textarea rows={6} cols={43} name="reason" onChange={handleInputChange} onBlur={handleBlur} className="border-2" />
+
+                {!approvalInfo.approve && (
+                  <textarea
+                    rows={6}
+                    cols={37}
+                    name="reason"
+                    onChange={handleInputChange}
+                    onBlur={handleBlur}
+                    className="border-2"
+                    placeholder="Provide reason for denial"
+                  />
+                )}
               </div>
             </div>
             {error && <p className=" text-red-500">{error}</p>}
             <div className="flex justify-between">
               <button
-                onClick={ () => setIsModalOpen(false) }
+                onClick={() => setIsModalOpen(false)}
                 className="mt-4 bg-red-500 text-white px-4 py-2 rounded cursor-pointer left-element"
               >
                 Close
