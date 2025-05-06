@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { PlusIcon } from "./Icons";
+import { UserControllerApi } from "../typing";
 
 interface ModalProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface FormData {
   lastName: string;
   email: string;
   userLevel: string;
+  title: string;
 }
 
 export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
@@ -20,7 +22,20 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
     lastName: "",
     email: "",
     userLevel: "", // todo jank do fixy
+    title: "",
   });
+
+  async function createUser(): Promise<void> {
+    const api: UserControllerApi = new UserControllerApi();
+
+    api.addUser({ createUserRequest: {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      level: parseInt(formData.userLevel),
+      title: formData.title
+    }});
+  }
 
   if (!isOpen) return null; // Hide modal if not open
 
@@ -33,7 +48,8 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
       firstName: "",
       lastName: "",
       email: "",
-      userLevel: ""
+      userLevel: "",
+      title: ""
     })
   }
 
@@ -60,7 +76,7 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
 
         <h2 className="text-xl font-bold mb-4 text-center">User Information</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={createUser} className="space-y-3">
           <input
             type="text"
             name="firstName"
@@ -87,6 +103,16 @@ export const UserFormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
             value={formData.email}
             onChange={handleChange}
             placeholder="Email Address"
+            className="w-full p-2 border rounded-md"
+            required
+          />
+
+          <input
+            type="title"
+            name="title"
+            value={formData.title}
+            onChange={handleChange}
+            placeholder="Title"
             className="w-full p-2 border rounded-md"
             required
           />
