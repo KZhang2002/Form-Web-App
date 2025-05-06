@@ -193,11 +193,20 @@ export const Home = () => {
     }
   };
 
-  const filteredRows = processedListData.filter(row =>
+  const filteredRows = processedListData.filter((row, index) =>
     row.some(cell =>
       cell.toString().toLowerCase().includes(query.toLowerCase())
     )
   );
+
+  const filteredFormIdListData = processedListData
+    .map((_, index) => index)
+    .filter(index =>
+      processedListData[index].some(cell =>
+        cell.toString().toLowerCase().includes(query.toLowerCase())
+      )
+    )
+    .map(index => formIdListData[index]);
 
   useEffect(() => {
     console.log("Switched to section", section)
@@ -257,7 +266,7 @@ export const Home = () => {
             </div>
           </div>
 
-          <List data={filteredRows} formIds={formIdListData} sectionHeaders={sectionHeaders} refreshData={fetchFormData}
+          <List data={filteredRows} formIds={filteredFormIdListData} sectionHeaders={sectionHeaders} refreshData={fetchFormData}
                 filterType={section ?? ""}/>
         </div>
       </div>
