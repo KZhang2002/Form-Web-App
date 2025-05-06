@@ -39,6 +39,10 @@ export interface ChangeUserPasswordOperationRequest {
     changeUserPasswordRequest: ChangeUserPasswordRequest;
 }
 
+export interface DeleteUserRequest {
+    username: string;
+}
+
 export interface GetUserFromFormRequest {
     formId: number;
 }
@@ -128,6 +132,40 @@ export class UserControllerApi extends runtime.BaseAPI {
     async changeUserPassword(requestParameters: ChangeUserPasswordOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<LoginCredential> {
         const response = await this.changeUserPasswordRaw(requestParameters, initOverrides);
         return await response.value();
+    }
+
+    /**
+     */
+    async deleteUserRaw(requestParameters: DeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['username'] == null) {
+            throw new runtime.RequiredError(
+                'username',
+                'Required parameter "username" was null or undefined when calling deleteUser().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['username'] != null) {
+            queryParameters['username'] = requestParameters['username'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/user`,
+            method: 'DELETE',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.VoidApiResponse(response);
+    }
+
+    /**
+     */
+    async deleteUser(requestParameters: DeleteUserRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.deleteUserRaw(requestParameters, initOverrides);
     }
 
     /**
