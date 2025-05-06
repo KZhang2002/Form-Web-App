@@ -14,6 +14,7 @@ function App() {
       <Route path="/" element={<Login/>}/>
       <Route path="/reset_password" element={<ResetPassword/>}/>
       <Route path="/doc" element={<DocumentView/>}/>
+      <Route path="/doc/:formId" element={<DocumentView/>}/>
       <Route path="/home" element={<Home/>}/>
       {/*<Route path="/sent" element={<Home/>}/>*/}
       {/*<Route path="/userList" element={<Home/>}/>*/}

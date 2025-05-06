@@ -19,10 +19,19 @@ type ListItemProps = {
   index: number;
   headers: string[]; // Array of section headers
   data: string[]; // Array of corresponding data
+  isForm?: boolean;
+  formId?: number;
 };
 
 const ListItem = (props: ListItemProps) => {
-  const { isHeader, headers, data, index } = props;
+  const { isHeader, headers, data, index, isForm = false, formId = -1 } = props;
+
+  const navigate = useNavigate();
+
+  const handleClick = (id: number) => {
+    if (isHeader || !isForm) return;
+    navigate(`/doc/${formId}`);
+  };
 
   // If there is no data to show and it's not the header, display a message
   if (!isHeader && (!data || data.length === 0)) {
@@ -43,7 +52,9 @@ const ListItem = (props: ListItemProps) => {
   else color = "bg-slate-100";
 
   return (
-    <md-list-item className={`w-[1421px] items-center ${color} ${isHeader ? "" : "cursor-pointer"}`}>
+    <md-list-item className={`w-[1421px] items-center ${color} ${isHeader || !isForm ? "" : "cursor-pointer"}`}
+                  onClick={() => handleClick(1)}
+    >
       <div slot="headline" className="justify-start gap-9 flex">
         {(isHeader ? headers : data).map((text, idx) => (
           <div
@@ -65,9 +76,10 @@ type ListProps = {
   data: any[]; // Array of data objects
   refreshData: (filterType: string) => Promise<void>;
   filterType: string;
+  isForms: boolean;
 };
 
-export const List = ({ sectionHeaders, data, refreshData, filterType }: ListProps) => {
+export const List = ({ sectionHeaders, data, refreshData, filterType, isForms }: ListProps) => {
   console.log("List received this data: ", data);
 
   return (
@@ -83,7 +95,7 @@ export const List = ({ sectionHeaders, data, refreshData, filterType }: ListProp
           <ListItem key={-1} isHeader={true} index={-1} headers={sectionHeaders} data={[]} />
           {data.length ? (
             data.map((row, index) => (
-              <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} />
+              <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} isForm={isForms} formId={index + 1} />
             ))
           ) : (
             <ListItem key={0} isHeader={false} index={0} headers={sectionHeaders} data={[]} />

@@ -33,7 +33,7 @@ export const Home = () => {
   const [processedListData, setProcessedListData] = useState<any[]>([]);
   const [listData, setListData] = useState<Form[]>([]);
   const { section } = useParams();
-  const { userInfo } = useAuthStore();
+  const userInfo = useAuthStore((state) => state.userInfo);
 
   const fetchFormData = async (filterType: string) => {
     console.log(`Attempting fetch data for section: ${filterType ?? "default"}`);
@@ -161,7 +161,7 @@ export const Home = () => {
         <div data-layer="MainContent"
              className="MainContent flex flex-col items-start gap-[30px] w-[1614px] pt-[30px] pr-[34px] pb-0 pl-[30px] self-stretch">
           {/*<SearchBar/>*/}
-          <List data={processedListData} sectionHeaders={sectionHeaders} refreshData={fetchFormData} filterType={section} />
+          <List data={processedListData} sectionHeaders={sectionHeaders} refreshData={fetchFormData} filterType={section ?? ""} isForms={section !== "userList"} />
         </div>
       </div>
     </div>

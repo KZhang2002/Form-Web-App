@@ -4,9 +4,10 @@ import './Home'
 import NavBar from "./components/NavBar";
 import { NavDrawer } from "./components/NavDrawer";
 import { RequestIcon, SentIcon, DraftIcon } from "./components/Icons";
-import { useLocation, useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import { LoginInfo } from './Login';
 import { Form, FormControllerApi, FormSignature, FormTemplate, FormTemplateControllerApi, UserControllerApi, UserInfo } from './typing';
+import {useAuthStore} from "./stores/useAuthStore";
 
 interface ModalProps {
   isOpen: boolean;
@@ -35,11 +36,11 @@ export interface ApprovalInfo {
 }
 
 type DocToolProps = {
-  loginInfo: LoginInfo;
+  formId: number;
   refreshForm: (formId: number) => Promise<void>;
 }
 
-const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) => {
+const DocumentToolDrawer: React.FC<DocToolProps> = ({ formId, refreshForm }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isUserListOpen, setIsUserListOpen] = useState(false);
   const navigate = useNavigate();
@@ -52,8 +53,10 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) 
 
   const [form, setForm] = useState<Form | null>(null);
   const [formTemplate, setFormTemplate] = useState<FormTemplate | null>(null);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [authorInfo, setAuthorInfo] = useState<UserInfo | null>(null);
   const [signatureUserInfos, setSignatureUserInfos] = useState<Array<UserInfo> | null>(null);
+
+  const userInfo = useAuthStore((state) => state.userInfo);
 
   async function refreshLocalForm(formId: number): Promise<void> {
     const updatedForm = await loadForm(formId);
@@ -69,14 +72,14 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) 
   useEffect(() => {
     const getForm = async () => {
       try {
-        const loadedForm = await loadForm(parseInt(loginInfo.password));
+        const loadedForm = await loadForm(formId);
         setForm(loadedForm);
         if (loadedForm.formId != null) {
           const loadedTemplate = await loadTemplate(loadedForm.formId);
           setFormTemplate(loadedTemplate);
 
           const loadedUser = await loadUserInfo(loadedForm.formId);
-          setUserInfo(loadedUser);
+          setAuthorInfo(loadedUser);
 
           const loadedSignatureUsers = await loadUserInfoFromSignatures(loadedForm);
           setSignatureUserInfos(loadedSignatureUsers);
@@ -86,7 +89,7 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) 
       }
     };
     getForm();
-  }, []);
+  }, [formId]);
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -94,11 +97,12 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) 
   }
 
   async function handleApproval(): Promise<void> {
-    const user = signatureUserInfos?.find(u => u.username === loginInfo.username);
+    const user = signatureUserInfos?.find(u => u.username === authorInfo?.username);
 
     const api: FormControllerApi = new FormControllerApi();
 
-    await api.signForm({ signFormRequest: { formId: form?.formId, username: loginInfo.username, approved: approvalInfo.approve, denialReason: approvalInfo.approve ? "" : approvalInfo.reason }})
+    // username is person who attempts to sign
+    await api.signForm({ signFormRequest: { formId: form?.formId, username: authorInfo?.username, approved: approvalInfo.approve, denialReason: approvalInfo.approve ? "" : approvalInfo.reason }})
 
     if(form?.formId)
       refreshForm(form.formId);
@@ -108,7 +112,7 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) 
 
   const handleBlur = (): string => {
     let errorText = "";
-    if (approvalInfo.approve === false && approvalInfo.reason == "") {
+    if (!approvalInfo.approve && approvalInfo.reason == "") {
       errorText = "Reason can not be empty";
     }
     else {
@@ -122,7 +126,7 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) 
   const handleDelete = (): void => {
     const api: FormControllerApi = new FormControllerApi();
 
-    api.deleteForm( { formId: form?.formId ? form?.formId : 0 })
+    api.deleteForm( { formId: form?.formId ?? 0 })
 
     navigate('/home');
   }
@@ -137,8 +141,8 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) 
           <div data-layer="Label"
             className="Label grow shrink basis-0 text-[#49454f] text-sm font-medium font-['Roboto'] leading-tight tracking-tight cursor-pointer"
             onClick={() => {
-              if(form?.formSignatureSet?.find(u => u.userInfo?.username === loginInfo.username)?.approved == null){
-                console.log(form?.formSignatureSet?.find(u => u.userInfo?.username === loginInfo.username)?.approved);
+              if(form?.formSignatureSet?.find(u => u.userInfo?.username === userInfo?.username)?.approved == null){
+                console.log(form?.formSignatureSet?.find(u => u.userInfo?.username === userInfo?.username)?.approved);
                 setIsModalOpen(true)
               }
             }}>Document Approval
@@ -233,7 +237,7 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) 
           </div>
         </div>
       </div>
-      { userInfo?.username === loginInfo.username ? 
+      { authorInfo?.username === userInfo?.username ?
         <div data-layer="Delete"
         className="Delete self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
         <div data-layer="state-layer"
@@ -255,9 +259,9 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ loginInfo, refreshForm }) 
 //   try {
 //     const api = new FormControllerApi();
 //     const form = await api.getForm({ formId: formId });
-
+//
 //     form.
-
+//
 //     if(!user.loginCredential?.setPassword) {
 //       navigate("/reset_password", {state: loginInfo});
 //     }
@@ -310,12 +314,14 @@ async function loadUserInfoFromSignatures(form: Form): Promise<Array<UserInfo>> 
 
 export const DocumentView = () => {
   const location = useLocation();
-  const loginInfo: LoginInfo = location.state || { username: "Placeholder", password: "Placeholder" }; // todo add zustand to simplify passing down data
+  // const loginInfo: LoginInfo = location.state || { username: "Placeholder", password: "Placeholder" }; // todo add zustand to simplify passing down data
 
   const [form, setForm] = useState<Form | null>(null);
   const [formTemplate, setFormTemplate] = useState<FormTemplate | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [signatureUserInfos, setSignatureUserInfos] = useState<Array<UserInfo> | null>(null);
+
+  const { formId } = useParams();
 
   async function refreshForm(formId: number): Promise<void> {
     const updatedForm = await loadForm(formId);
@@ -323,13 +329,17 @@ export const DocumentView = () => {
   }
 
   useEffect(() => {
+    console.log("form id", formId);
     const getForm = async () => {
       try {
-        const loadedForm = await loadForm(parseInt(loginInfo.password));
+        const loadedForm = await loadForm(formId);
         setForm(loadedForm);
+        console.log("loaded form", loadedForm)
         if (loadedForm.formId != null) {
           const loadedTemplate = await loadTemplate(loadedForm.formId);
           setFormTemplate(loadedTemplate);
+
+          console.log("form template", loadedTemplate);
 
           const loadedUser = await loadUserInfo(loadedForm.formId);
           setUserInfo(loadedUser);
@@ -347,7 +357,7 @@ export const DocumentView = () => {
   return (
     <div>
       <div className="DefaultLayout w-full h-full bg-white flex-col justify-start items-start inline-flex overflow-hidden">
-        <NavBar username={loginInfo.username} showAccount={true} />
+        <NavBar showAccount={true} />
       </div>
       {form && formTemplate && userInfo && signatureUserInfos ? (
         <div data-layer="Content" className="Content h-[995px] justify-start items-center gap-2.5 flex">
@@ -357,7 +367,7 @@ export const DocumentView = () => {
               <div className="flex flex-col">
                 <div className="relative w-full h-6">
                   <div className="absolute left-1/2 transform -translate-x-1/2">SOUTHERN METHODIST UNIVERSITY</div>
-                  <div className="absolute right-0">{formTemplate?.formTemplateIdentifier}</div>
+                  <div className="absolute right-0">Form Type: {formTemplate?.formTemplateIdentifier}</div>
                 </div>
                 <div className="mt-2 text-center">{formTemplate?.formTitle}</div>
                 <div className="mt-2">{formTemplate?.formDescription}</div>
@@ -371,11 +381,17 @@ export const DocumentView = () => {
                 </div>
                 <div className="w-full h-1 bg-black mt-2"></div>
                 <div className="mt-2">
-                  {form?.formContentSet?.map((item, index) => (
-                    <div key={index} className="mb-2">
-                      <span className="font-semibold">{item.formTemplateContent?.contentName}:</span> {item.contentData}
-                    </div>
-                  ))}
+                  {form?.formContentSet?.map((item, index) => {
+                    console.log("item", item);
+                    console.log("form", form);
+                    return (
+                      <div key={index} className="mb-2 whitespace-pre-wrap">
+                        <span
+                          className="font-semibold">{formTemplate?.formTemplateContentSet?.[index]?.contentName}:</span>
+                        {item.contentData?.replaceAll('\\n', '\n')}
+                      </div>
+                    )
+                  })}
                 </div>
                 <div className="flex justify-between items-center w-full mt-2">
                   <div>Signature of the applicant: {userInfo?.lastName}, {userInfo?.firstName}</div>
@@ -413,7 +429,7 @@ export const DocumentView = () => {
 
             </div>
           </div>
-          <DocumentToolDrawer loginInfo={loginInfo} refreshForm={refreshForm} />
+          <DocumentToolDrawer formId={formId} refreshForm={refreshForm} />
         </div>
       ) : (
         <div>Loading...</div>

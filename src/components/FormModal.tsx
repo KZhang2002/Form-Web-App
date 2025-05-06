@@ -44,7 +44,7 @@ export const FormModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) =
     }
 
     getTemplates();
-  })
+  }, [])
 
   async function createForm(): Promise<void> {
     const api: FormControllerApi = new FormControllerApi();
