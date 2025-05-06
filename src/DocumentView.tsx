@@ -97,12 +97,10 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ formId, refreshForm }) => 
   }
 
   async function handleApproval(): Promise<void> {
-    const user = signatureUserInfos?.find(u => u.username === authorInfo?.username);
-
     const api: FormControllerApi = new FormControllerApi();
 
     // username is person who attempts to sign
-    await api.signForm({ signFormRequest: { formId: form?.formId, username: authorInfo?.username, approved: approvalInfo.approve, denialReason: approvalInfo.approve ? "" : approvalInfo.reason }})
+    await api.signForm({ signFormRequest: { formId: form?.formId, username: useAuthStore.getState().userInfo?.username, approved: approvalInfo.approve, denialReason: approvalInfo.approve ? "" : approvalInfo.reason }})
 
     if(form?.formId)
       refreshForm(form.formId);
@@ -261,7 +259,7 @@ const DocumentToolDrawer: React.FC<DocToolProps> = ({ formId, refreshForm }) => 
           </div>
         </div>
       </div>
-      { authorInfo?.username === userInfo?.username ?
+      { authorInfo?.username === userInfo?.username || useAuthStore.getState().userInfo?.admin ?
         <div data-layer="Delete"
         className="Delete self-stretch h-14 rounded-[100px] justify-start items-center gap-3 inline-flex overflow-hidden cursor-pointer">
         <div data-layer="state-layer"
@@ -349,6 +347,8 @@ export const DocumentView = () => {
 
   async function refreshForm(formId: number): Promise<void> {
     const updatedForm = await loadForm(formId);
+    console.log("Refresh Form");
+    console.log(updatedForm);
     setForm(updatedForm);
   }
 
@@ -406,8 +406,6 @@ export const DocumentView = () => {
                 <div className="w-full h-1 bg-black mt-2"></div>
                 <div className="mt-2">
                   {form?.formContentSet?.map((item, index) => {
-                    console.log("item", item);
-                    console.log("form", form);
                     return (
                       <div key={index} className="mb-2 whitespace-pre-wrap">
                         <span
