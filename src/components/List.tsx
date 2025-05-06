@@ -1,5 +1,8 @@
 import {useNavigate} from "react-router-dom";
 import React from "react";
+import {PlusIcon} from "./Icons";
+import {UserControllerApi} from "../typing";
+import {useAuthStore} from "../stores/useAuthStore";
 
 export const headerToKeyMap: Record<string, string> = {
   "Username": "username",
@@ -21,14 +24,28 @@ type ListItemProps = {
   data: string[]; // Array of corresponding data
   formId?: number | string;
   filterType?: string;
+  refreshData?: (...args: any[]) => any;
 };
 
 const ListItem = (props: ListItemProps) => {
-  const { isHeader, headers, data, index, filterType = "formList", formId = 1 } = props;
+  const { isHeader, headers, data, index, filterType = "formList", formId = 1, refreshData } = props;
 
   const navigate = useNavigate();
 
   const interactionDisabled = isHeader || filterType == "userList";
+
+  const userInfo = useAuthStore((state) => state.userInfo);
+
+  const handleDelete = async () => {
+    try {
+      const userApi = new UserControllerApi();
+      await userApi.deleteUser({ username: formId });
+      refreshData(filterType);
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+    }
+  };
+
 
   const handleClick = (id: number) => {
     if (interactionDisabled) return;
@@ -67,11 +84,15 @@ const ListItem = (props: ListItemProps) => {
             {text ?? "error"}
           </div>
         ))}
+        { userInfo?.admin && !isHeader && filterType === "userList" && <div className="text-zinc-900 text-base font-normal font-['Roboto'] leading-normal tracking-wide">
+          <div className={"cursor-pointer"} onClick={() => {handleDelete()}}>
+            <PlusIcon/>
+          </div>
+        </div>}
       </div>
     </md-list-item>
   );
 };
-
 
 
 type ListProps = {
@@ -100,7 +121,7 @@ export const List = ({ sectionHeaders, data, formIds, refreshData, filterType }:
           <ListItem key={-1} isHeader={true} index={-1} headers={sectionHeaders} data={[]} />
           {data.length ? (
             data.map((row, index) => (
-              <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} filterType={filterType} formId={formIds[index]} />
+              <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} filterType={filterType} formId={formIds[index]} refreshData={refreshData}/>
             ))
           ) : (
             <ListItem key={0} isHeader={false} index={0} headers={sectionHeaders} data={[]} />
