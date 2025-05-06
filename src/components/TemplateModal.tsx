@@ -82,6 +82,7 @@ export const TemplateModal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit 
         }})
     }
 
+    if (!isOpen) return null;
     return (
         <div>
             <div className="fixed inset-0 flex items-center justify-center bg-black/70 z-50">
