@@ -37,6 +37,18 @@ export interface CreateFormRequest {
      * @memberof CreateFormRequest
      */
     username?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CreateFormRequest
+     */
+    formContent?: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CreateFormRequest
+     */
+    signatureUsernames?: Array<string>;
 }
 
 /**
@@ -59,6 +71,8 @@ export function CreateFormRequestFromJSONTyped(json: any, ignoreDiscriminator: b
         'published': json['published'] == null ? undefined : json['published'],
         'formTemplateIdentifier': json['formTemplateIdentifier'] == null ? undefined : json['formTemplateIdentifier'],
         'username': json['username'] == null ? undefined : json['username'],
+        'formContent': json['formContent'] == null ? undefined : json['formContent'],
+        'signatureUsernames': json['signatureUsernames'] == null ? undefined : json['signatureUsernames'],
     };
 }
 
@@ -76,6 +90,8 @@ export function CreateFormRequestToJSONTyped(value?: CreateFormRequest | null, i
         'published': value['published'],
         'formTemplateIdentifier': value['formTemplateIdentifier'],
         'username': value['username'],
+        'formContent': value['formContent'],
+        'signatureUsernames': value['signatureUsernames'],
     };
 }
 
