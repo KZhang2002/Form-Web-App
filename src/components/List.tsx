@@ -74,12 +74,13 @@ const ListItem = (props: ListItemProps) => {
 type ListProps = {
   sectionHeaders: string[]; // Array of section headers
   data: any[]; // Array of data objects
+  formIds: any[]; // Array of data objects
   refreshData: (filterType: string) => Promise<void>;
   filterType: string;
   isForms: boolean;
 };
 
-export const List = ({ sectionHeaders, data, refreshData, filterType, isForms }: ListProps) => {
+export const List = ({ sectionHeaders, data, formIds, refreshData, filterType, isForms }: ListProps) => {
   console.log("List received this data: ", data);
 
   return (
@@ -95,7 +96,7 @@ export const List = ({ sectionHeaders, data, refreshData, filterType, isForms }:
           <ListItem key={-1} isHeader={true} index={-1} headers={sectionHeaders} data={[]} />
           {data.length ? (
             data.map((row, index) => (
-              <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} isForm={isForms} formId={index + 1} />
+              <ListItem key={index} isHeader={false} index={index} headers={sectionHeaders} data={row} isForm={isForms} formId={formIds[index]} />
             ))
           ) : (
             <ListItem key={0} isHeader={false} index={0} headers={sectionHeaders} data={[]} />
